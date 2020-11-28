@@ -12,6 +12,7 @@ void main() {
   _trackPageView();
   _trackRequest();
   _trackTrace();
+  _flush();
 }
 
 void _trackError() {
@@ -189,6 +190,24 @@ void _trackTrace() {
               return false;
             }),
           );
+        },
+      );
+    },
+  );
+}
+
+void _flush() {
+  group(
+    'flush',
+    () {
+      test(
+        'forwards to processor',
+        () async {
+          final processor = ProcessorMock();
+          final sut = TelemetryClient(processor: processor);
+          await sut.flush();
+
+          verify(processor.flush()).called(1);
         },
       );
     },

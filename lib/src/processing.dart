@@ -83,9 +83,10 @@ class BufferedProcessor implements Processor {
       }
     }
 
+    // It's vital to call cancel here in case flush was called pro-actively prior to shutting down the application.
+    // If the timer is not canceled, it will cause the process to wait for it to fire before it exits.
+    _flushTimer?.cancel();
     _flushTimer = null;
-
-    return Future<void>.value(null);
   }
 }
 
@@ -125,7 +126,10 @@ class TransmissionProcessor implements Processor {
   }
 
   @override
-  Future<void> flush() => Future.wait(_outstandingFutures);
+  Future<void> flush() => Future.wait([
+        ..._outstandingFutures,
+        if (next != null) next.flush(),
+      ]);
 
   Future<void> _transmit({
     @required List<TelemetryWithContext> telemetryWithContext,
@@ -217,6 +221,8 @@ class DebugProcessor implements Processor {
   @override
   Future<void> flush({
     @required TelemetryContext context,
-  }) =>
-      Future<void>.value(null);
+  }) async {
+    print('Flushing');
+    await next?.flush();
+  }
 }
