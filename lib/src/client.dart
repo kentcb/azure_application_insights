@@ -31,9 +31,13 @@ class TelemetryClient {
   /// Creates a telemetry client.
   ///
   /// The provided [processor] will receive all telemetry events created by this [TelemetryClient].
+  ///
+  /// Callers can optionally specify a [context] to use, which facilitates sharing a single [TelemetryContext]
+  /// between multiple [TelemetryClient] instances. If unspecified, a new [TelemetryContext] will be created instead.
   TelemetryClient({
     @required this.processor,
-  }) : context = TelemetryContext();
+    TelemetryContext context,
+  }) : context = context ?? TelemetryContext();
 
   /// A [Processor] that receives all telemetry items created by this [TelemetryClient].
   ///

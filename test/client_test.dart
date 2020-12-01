@@ -7,12 +7,45 @@ import 'package:test/test.dart';
 import 'mocks.dart';
 
 void main() {
+  _constructor();
   _trackError();
   _trackEvent();
   _trackPageView();
   _trackRequest();
   _trackTrace();
   _flush();
+}
+
+void _constructor() {
+  group(
+    'constructor',
+    () {
+      test(
+        'an empty context is created by default',
+        () {
+          final processor = ProcessorMock();
+          final sut = TelemetryClient(processor: processor);
+
+          expect(sut.context.properties.isEmpty, true);
+        },
+      );
+
+      test(
+        'a context can be explicitly provided',
+        () {
+          final context = TelemetryContext();
+          context.properties['foo'] = 42;
+          final processor = ProcessorMock();
+          final sut = TelemetryClient(
+            processor: processor,
+            context: context,
+          );
+
+          expect(sut.context.properties.isEmpty, false);
+        },
+      );
+    },
+  );
 }
 
 void _trackError() {
