@@ -30,15 +30,17 @@ void _trackError() {
           );
 
           expect(
-            verify(processor.process(telemetryWithContext: captureAnyNamed('telemetryWithContext'))).captured.single,
-            predicate<List<TelemetryWithContext>>((v) {
+            verify(processor.process(contextualTelemetryItems: captureAnyNamed('contextualTelemetryItems')))
+                .captured
+                .single,
+            predicate<List<ContextualTelemetryItem>>((v) {
               if (v.length != 1) {
                 return false;
               }
 
-              final telemetry = v[0].telemetry;
+              final telemetry = v[0].telemetryItem;
 
-              if (telemetry is ExceptionTelemetry) {
+              if (telemetry is ExceptionTelemetryItem) {
                 return telemetry.severity == Severity.critical && telemetry.error == 'an error';
               }
 
@@ -65,15 +67,17 @@ void _trackEvent() {
           );
 
           expect(
-            verify(processor.process(telemetryWithContext: captureAnyNamed('telemetryWithContext'))).captured.single,
-            predicate<List<TelemetryWithContext>>((v) {
+            verify(processor.process(contextualTelemetryItems: captureAnyNamed('contextualTelemetryItems')))
+                .captured
+                .single,
+            predicate<List<ContextualTelemetryItem>>((v) {
               if (v.length != 1) {
                 return false;
               }
 
-              final telemetry = v[0].telemetry;
+              final telemetry = v[0].telemetryItem;
 
-              if (telemetry is EventTelemetry) {
+              if (telemetry is EventTelemetryItem) {
                 return telemetry.name == 'an event';
               }
 
@@ -100,15 +104,17 @@ void _trackPageView() {
           );
 
           expect(
-            verify(processor.process(telemetryWithContext: captureAnyNamed('telemetryWithContext'))).captured.single,
-            predicate<List<TelemetryWithContext>>((v) {
+            verify(processor.process(contextualTelemetryItems: captureAnyNamed('contextualTelemetryItems')))
+                .captured
+                .single,
+            predicate<List<ContextualTelemetryItem>>((v) {
               if (v.length != 1) {
                 return false;
               }
 
-              final telemetry = v[0].telemetry;
+              final telemetry = v[0].telemetryItem;
 
-              if (telemetry is PageViewTelemetry) {
+              if (telemetry is PageViewTelemetryItem) {
                 return telemetry.name == 'a page';
               }
 
@@ -137,15 +143,17 @@ void _trackRequest() {
           );
 
           expect(
-            verify(processor.process(telemetryWithContext: captureAnyNamed('telemetryWithContext'))).captured.single,
-            predicate<List<TelemetryWithContext>>((v) {
+            verify(processor.process(contextualTelemetryItems: captureAnyNamed('contextualTelemetryItems')))
+                .captured
+                .single,
+            predicate<List<ContextualTelemetryItem>>((v) {
               if (v.length != 1) {
                 return false;
               }
 
-              final telemetry = v[0].telemetry;
+              final telemetry = v[0].telemetryItem;
 
-              if (telemetry is RequestTelemetry) {
+              if (telemetry is RequestTelemetryItem) {
                 return telemetry.id == 'a request' &&
                     telemetry.duration == const Duration(milliseconds: 283) &&
                     telemetry.responseCode == '200';
@@ -175,15 +183,17 @@ void _trackTrace() {
           );
 
           expect(
-            verify(processor.process(telemetryWithContext: captureAnyNamed('telemetryWithContext'))).captured.single,
-            predicate<List<TelemetryWithContext>>((v) {
+            verify(processor.process(contextualTelemetryItems: captureAnyNamed('contextualTelemetryItems')))
+                .captured
+                .single,
+            predicate<List<ContextualTelemetryItem>>((v) {
               if (v.length != 1) {
                 return false;
               }
 
-              final telemetry = v[0].telemetry;
+              final telemetry = v[0].telemetryItem;
 
-              if (telemetry is TraceTelemetry) {
+              if (telemetry is TraceTelemetryItem) {
                 return telemetry.severity == Severity.critical && telemetry.message == 'a message';
               }
 

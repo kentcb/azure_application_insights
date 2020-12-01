@@ -1,6 +1,6 @@
 import 'dart:math';
 
-/// Formats a [Duration] as `[d'.']hh':'mm':'ss['.'ffffff]`, which closely matches the format being provided from the .NET back-end.
+// Formats a [Duration] as `[d'.']hh':'mm':'ss['.'ffffff]`, which closely matches the format being provided from the .NET back-end.
 String formatDurationForDotNet(Duration duration) {
   void writePadded(
     StringBuffer stringBuffer,

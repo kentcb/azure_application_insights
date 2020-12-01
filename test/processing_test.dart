@@ -26,15 +26,15 @@ void _bufferedProcessor() {
             next: next,
           );
           sut.process(
-            telemetryWithContext: [
-              TelemetryWithContext(
-                telemetry: EventTelemetry(name: 'anything'),
+            contextualTelemetryItems: [
+              ContextualTelemetryItem(
+                telemetryItem: EventTelemetryItem(name: 'anything'),
                 context: TelemetryContext(),
               ),
             ],
           );
 
-          verify(next.process(telemetryWithContext: anyNamed('telemetryWithContext'))).called(1);
+          verify(next.process(contextualTelemetryItems: anyNamed('contextualTelemetryItems'))).called(1);
         },
       );
 
@@ -48,19 +48,19 @@ void _bufferedProcessor() {
             next: next,
           );
           sut.process(
-            telemetryWithContext: [
-              TelemetryWithContext(
-                telemetry: EventTelemetry(name: 'anything'),
+            contextualTelemetryItems: [
+              ContextualTelemetryItem(
+                telemetryItem: EventTelemetryItem(name: 'anything'),
                 context: TelemetryContext(),
               ),
-              TelemetryWithContext(
-                telemetry: EventTelemetry(name: 'anything'),
+              ContextualTelemetryItem(
+                telemetryItem: EventTelemetryItem(name: 'anything'),
                 context: TelemetryContext(),
               ),
             ],
           );
 
-          verify(next.process(telemetryWithContext: anyNamed('telemetryWithContext'))).called(1);
+          verify(next.process(contextualTelemetryItems: anyNamed('contextualTelemetryItems'))).called(1);
         },
       );
 
@@ -76,19 +76,19 @@ void _bufferedProcessor() {
                 next: next,
               );
               sut.process(
-                telemetryWithContext: [
-                  TelemetryWithContext(
-                    telemetry: EventTelemetry(name: 'anything'),
+                contextualTelemetryItems: [
+                  ContextualTelemetryItem(
+                    telemetryItem: EventTelemetryItem(name: 'anything'),
                     context: TelemetryContext(),
                   ),
                 ],
               );
 
-              verifyNever(next.process(telemetryWithContext: anyNamed('telemetryWithContext')));
+              verifyNever(next.process(contextualTelemetryItems: anyNamed('contextualTelemetryItems')));
               async.elapse(const Duration(seconds: 5));
-              verifyNever(next.process(telemetryWithContext: anyNamed('telemetryWithContext')));
+              verifyNever(next.process(contextualTelemetryItems: anyNamed('contextualTelemetryItems')));
               async.elapse(const Duration(seconds: 6));
-              verify(next.process(telemetryWithContext: anyNamed('telemetryWithContext'))).called(1);
+              verify(next.process(contextualTelemetryItems: anyNamed('contextualTelemetryItems'))).called(1);
             },
           );
         },
@@ -103,7 +103,7 @@ void _bufferedProcessor() {
           );
           sut.flush();
 
-          verifyNever(next.process(telemetryWithContext: anyNamed('telemetryWithContext')));
+          verifyNever(next.process(contextualTelemetryItems: anyNamed('contextualTelemetryItems')));
         },
       );
 
@@ -116,17 +116,17 @@ void _bufferedProcessor() {
             next: next,
           );
           sut.process(
-            telemetryWithContext: [
-              TelemetryWithContext(
-                telemetry: EventTelemetry(name: 'anything'),
+            contextualTelemetryItems: [
+              ContextualTelemetryItem(
+                telemetryItem: EventTelemetryItem(name: 'anything'),
                 context: TelemetryContext(),
               ),
             ],
           );
 
-          verifyNever(next.process(telemetryWithContext: anyNamed('telemetryWithContext')));
+          verifyNever(next.process(contextualTelemetryItems: anyNamed('contextualTelemetryItems')));
           sut.flush();
-          verify(next.process(telemetryWithContext: anyNamed('telemetryWithContext'))).called(1);
+          verify(next.process(contextualTelemetryItems: anyNamed('contextualTelemetryItems'))).called(1);
         },
       );
     },
@@ -147,9 +147,9 @@ void _transmissionProcessor() {
             timeout: const Duration(seconds: 10),
           );
           sut.process(
-            telemetryWithContext: [
-              TelemetryWithContext(
-                telemetry: EventTelemetry(
+            contextualTelemetryItems: [
+              ContextualTelemetryItem(
+                telemetryItem: EventTelemetryItem(
                   name: 'anything',
                   timestamp: DateTime.utc(2020, 10, 26),
                 ),
@@ -180,9 +180,9 @@ void _transmissionProcessor() {
             next: next,
           );
           sut.process(
-            telemetryWithContext: [
-              TelemetryWithContext(
-                telemetry: EventTelemetry(
+            contextualTelemetryItems: [
+              ContextualTelemetryItem(
+                telemetryItem: EventTelemetryItem(
                   name: 'anything',
                   timestamp: DateTime(2020, 10, 26).toUtc(),
                 ),
@@ -191,7 +191,7 @@ void _transmissionProcessor() {
             ],
           );
 
-          verify(next.process(telemetryWithContext: anyNamed('telemetryWithContext'))).called(1);
+          verify(next.process(contextualTelemetryItems: anyNamed('contextualTelemetryItems'))).called(1);
         },
       );
     },

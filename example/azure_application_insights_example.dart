@@ -56,8 +56,8 @@ Future<void> _sendTelemetry() async {
       ..user.id = 'somebody';
 
     // All the above helper properties do is provide a convenient means of setting key/value pairs inside
-    // context.additionalProperties, which is the second way to set properties and is demonstrated here.
-    telemetryClient.context.additionalProperties['custom'] = 'a custom property value';
+    // context.properties, which is the second way to set properties and is demonstrated here.
+    telemetryClient.context.properties['custom'] = 'a custom property value';
 
     // Now we can send telemetry of various kinds. Here is a simple trace.
     telemetryClient.trackTrace(
@@ -71,7 +71,7 @@ Future<void> _sendTelemetry() async {
     telemetryClient.trackTrace(
       severity: Severity.verbose,
       message: 'Here is a trace with additional properties',
-      properties: <String, Object>{
+      additionalProperties: <String, Object>{
         'answer': 42,
       },
     );
@@ -79,7 +79,7 @@ Future<void> _sendTelemetry() async {
     // Here is an event with different properties.
     telemetryClient.trackEvent(
       name: 'started',
-      properties: <String, Object>{
+      additionalProperties: <String, Object>{
         'timestamp': DateTime.now().toUtc().toIso8601String(),
       },
     );

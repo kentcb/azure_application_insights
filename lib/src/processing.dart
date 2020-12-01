@@ -3,29 +3,52 @@ import 'dart:convert';
 
 import 'package:http/http.dart';
 import 'package:meta/meta.dart';
+import 'client.dart';
 import 'context.dart';
+import 'http.dart';
 import 'telemetry.dart';
 
+/// Used by a [TelemetryClient] to process telemetry items.
+///
+/// Processors implement the [chain of responsibility](https://en.wikipedia.org/wiki/Chain-of-responsibility_pattern#C#_example)
+/// pattern, with [next] being the subsequent processor in the chain. This allows a set of processors to be composed.
 abstract class Processor {
+  /// The next processor in the chain, or `null` if there is none.
+  Processor get next;
+
+  /// Requests that [contextualTelemetryItems] be processed by this [Processor].
   void process({
-    @required List<TelemetryWithContext> telemetryWithContext,
+    @required List<ContextualTelemetryItem> contextualTelemetryItems,
   });
 
+  /// Instructs the processor to force all telemetry items to be handled regardless of any internal buffering logic,
+  /// completing asynchronously once all items are flushed.
   Future<void> flush();
 }
 
+/// Encapsulates a [telemetryItem] and related [context].
 @immutable
-class TelemetryWithContext {
-  const TelemetryWithContext({
-    @required this.telemetry,
+class ContextualTelemetryItem {
+  /// Creates a new instance of [ContextualTelemetryItem].
+  const ContextualTelemetryItem({
+    @required this.telemetryItem,
     @required this.context,
-  })  : assert(telemetry != null),
+  })  : assert(telemetryItem != null),
         assert(context != null);
 
-  final Telemetry telemetry;
+  /// The telemetry.
+  final TelemetryItem telemetryItem;
+
+  /// The telemetry context.
   final TelemetryContext context;
 }
 
+/// A [Processor] that buffers up to [capacity] telemetry items for at most [flushDelay] before forwarding them onto
+/// [next].
+///
+/// Telemetry items passed into [process] will be added to a buffer of size [capacity]. If the buffer is full, all
+/// telemetry items within it are immediately forwarded onto [next]. Even if the buffer is not full, telemetry items
+/// will be forwarded once [flushDelay] elapses.
 class BufferedProcessor implements Processor {
   BufferedProcessor({
     this.next,
@@ -35,23 +58,31 @@ class BufferedProcessor implements Processor {
         assert(capacity > 0),
         assert(flushDelay != null),
         assert(flushDelay >= Duration.zero),
-        _buffer = <TelemetryWithContext>[];
-
-  final Processor next;
-  final int capacity;
-  final List<TelemetryWithContext> _buffer;
-  final Duration flushDelay;
-
-  Timer _flushTimer;
+        _buffer = <ContextualTelemetryItem>[];
 
   @override
-  void process({
-    @required List<TelemetryWithContext> telemetryWithContext,
-  }) {
-    assert(telemetryWithContext != null);
+  final Processor next;
 
-    for (final telemetryWithContextItem in telemetryWithContext) {
-      _buffer.add(telemetryWithContextItem);
+  /// The capacity of the buffer which, once filled, will be immediately forwarded to [next].
+  final int capacity;
+
+  /// The maximum amount of time telemetry items can sit in the buffer before being forwarded onto [next].
+  final Duration flushDelay;
+
+  final List<ContextualTelemetryItem> _buffer;
+  Timer _flushTimer;
+
+  /// Add [contextualTelemetryItems] to the buffer, automatically forwarding telemetry if the buffer is full.
+  ///
+  /// Even if the buffer is not filled, it will eventually be forwarded once [flushDelay] elapses.
+  @override
+  void process({
+    @required List<ContextualTelemetryItem> contextualTelemetryItems,
+  }) {
+    assert(contextualTelemetryItems != null);
+
+    for (final contextualTelemetryItem in contextualTelemetryItems) {
+      _buffer.add(contextualTelemetryItem);
 
       if (_buffer.length > capacity) {
         // Capacity reached, so attempt to flush.
@@ -69,15 +100,16 @@ class BufferedProcessor implements Processor {
     }
   }
 
+  /// Forwards all items in the buffer onto [next] before also flushing [next].
   @override
   Future<void> flush() async {
     if (_buffer.isNotEmpty) {
-      final bufferClone = List<TelemetryWithContext>.from(_buffer);
+      final bufferClone = List<ContextualTelemetryItem>.from(_buffer);
       _buffer.clear();
 
       if (next != null) {
         next.process(
-          telemetryWithContext: bufferClone,
+          contextualTelemetryItems: bufferClone,
         );
         await next.flush();
       }
@@ -90,6 +122,7 @@ class BufferedProcessor implements Processor {
   }
 }
 
+/// A [Processor] that sends telemetry to the Azure Application Insights instance associated with [instrumentationKey].
 class TransmissionProcessor implements Processor {
   TransmissionProcessor({
     @required this.instrumentationKey,
@@ -101,18 +134,30 @@ class TransmissionProcessor implements Processor {
         assert(timeout != null),
         _outstandingFutures = <Future<void>>{};
 
+  @override
   final Processor next;
+
+  /// The Application Insights instrumentation key to use when submitting telemetry.
   final String instrumentationKey;
+
+  /// The HTTP client to use when submitting telemetry.
+  ///
+  /// Note that you should never use a [TelemetryHttpClient] for this value, since doing so would result in telemetry
+  /// being created recursively.
   final Client httpClient;
+
+  /// How long to wait before timing out on telemetry submission.
   final Duration timeout;
+
   final Set<Future<void>> _outstandingFutures;
 
+  /// Sends [contextualTelemetryItems] to Application Insights, then on to [next].
   @override
   void process({
-    @required List<TelemetryWithContext> telemetryWithContext,
+    @required List<ContextualTelemetryItem> contextualTelemetryItems,
   }) {
     final future = _transmit(
-      telemetryWithContext: telemetryWithContext,
+      contextualTelemetry: contextualTelemetryItems,
     );
 
     if (future != null) {
@@ -121,10 +166,11 @@ class TransmissionProcessor implements Processor {
     }
 
     next?.process(
-      telemetryWithContext: telemetryWithContext,
+      contextualTelemetryItems: contextualTelemetryItems,
     );
   }
 
+  /// Waits for any in flight telemetry submission, as well as flushing [next].
   @override
   Future<void> flush() => Future.wait([
         ..._outstandingFutures,
@@ -132,13 +178,13 @@ class TransmissionProcessor implements Processor {
       ]);
 
   Future<void> _transmit({
-    @required List<TelemetryWithContext> telemetryWithContext,
+    @required List<ContextualTelemetryItem> contextualTelemetry,
   }) async {
-    assert(telemetryWithContext != null);
-    print('Transmitting ${telemetryWithContext.length} telemetry items');
+    assert(contextualTelemetry != null);
+    print('Transmitting ${contextualTelemetry.length} telemetry items');
 
     final serialized = _serializeTelemetry(
-      telemetryWithContext: telemetryWithContext,
+      contextualTelemetry: contextualTelemetry,
     );
     final encoded = jsonEncode(serialized);
 
@@ -160,64 +206,71 @@ class TransmissionProcessor implements Processor {
   }
 
   List<Map<String, dynamic>> _serializeTelemetry({
-    @required List<TelemetryWithContext> telemetryWithContext,
+    @required List<ContextualTelemetryItem> contextualTelemetry,
   }) {
-    assert(telemetryWithContext != null);
+    assert(contextualTelemetry != null);
 
-    final result = telemetryWithContext
+    final result = contextualTelemetry
         .map((t) => _serializeTelemetryItem(
-              telemetryWithContext: t,
+              contextualTelemetry: t,
             ))
         .toList(growable: false);
     return result;
   }
 
   Map<String, dynamic> _serializeTelemetryItem({
-    @required TelemetryWithContext telemetryWithContext,
+    @required ContextualTelemetryItem contextualTelemetry,
   }) {
-    assert(telemetryWithContext != null);
+    assert(contextualTelemetry != null);
 
-    final telemetryData = telemetryWithContext.telemetry.getDataMap(context: telemetryWithContext.context);
-    final serializedContext = telemetryWithContext.context.getContextMap();
+    final serializedTelemetry = contextualTelemetry.telemetryItem.serialize(context: contextualTelemetry.context);
+    final contextProperties = contextualTelemetry.context.properties;
+    final serializedContext = contextProperties.isEmpty ? null : contextProperties;
     final result = <String, dynamic>{
-      'name': telemetryWithContext.telemetry.envelopeName,
-      'time': telemetryWithContext.telemetry.timestamp.toIso8601String(),
+      'name': contextualTelemetry.telemetryItem.envelopeName,
+      'time': contextualTelemetry.telemetryItem.timestamp.toIso8601String(),
       'iKey': instrumentationKey,
       'tags': <String, dynamic>{
         'ai.internal.sdkVersion': '1',
         if (serializedContext != null) ...serializedContext,
       },
-      'data': telemetryData,
+      'data': serializedTelemetry,
     };
     return result;
   }
 }
 
+/// A [Processor] that outputs messages that are useful in diagnosing telemetry processing.
 class DebugProcessor implements Processor {
+  /// Creates an instance of [DebugProcessor].
   DebugProcessor({
     this.next,
   });
 
+  @override
   final Processor next;
 
+  /// Outputs a message detailing the telemetry being processed, then forwards the telemetry onto [next].
   @override
   void process({
-    @required List<TelemetryWithContext> telemetryWithContext,
+    @required List<ContextualTelemetryItem> contextualTelemetryItems,
   }) {
-    assert(telemetryWithContext != null);
+    assert(contextualTelemetryItems != null);
 
-    print('Processing ${telemetryWithContext.length} telemetry items:');
+    print('Processing ${contextualTelemetryItems.length} telemetry items:');
 
-    for (final telemetryWithContextItem in telemetryWithContext) {
-      final json = jsonEncode(telemetryWithContextItem.telemetry.getDataMap(context: telemetryWithContextItem.context));
-      print('  - ${telemetryWithContextItem.telemetry.runtimeType}: $json');
+    for (final contextualTelemetryItem in contextualTelemetryItems) {
+      final json =
+          jsonEncode(contextualTelemetryItem.telemetryItem.serialize(context: contextualTelemetryItem.context));
+      print('  - ${contextualTelemetryItem.telemetryItem.runtimeType}: $json');
     }
 
     next?.process(
-      telemetryWithContext: telemetryWithContext,
+      contextualTelemetryItems: contextualTelemetryItems,
     );
   }
 
+  /// Outputs a message, then forwards onto [next].
   @override
   Future<void> flush({
     @required TelemetryContext context,

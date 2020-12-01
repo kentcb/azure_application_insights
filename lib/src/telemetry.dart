@@ -6,22 +6,28 @@ import 'package:stack_trace/stack_trace.dart';
 import 'context.dart';
 import 'serialization.dart';
 
+/// A base class for all types of telemetry items.
 @immutable
-abstract class Telemetry {
+abstract class TelemetryItem {
+  /// When the telemetry was created.
   DateTime get timestamp;
 
+  /// The Application Insights envelope name used when transmitting telemetry of this type.
   String get envelopeName;
 
-  Map<String, dynamic> getDataMap({
+  /// Gets a serialized representation of this telemetry.
+  Map<String, dynamic> serialize({
     @required TelemetryContext context,
   });
 }
 
+/// Represents a custom event telemetry item in Application Insights.
 @immutable
-class EventTelemetry implements Telemetry {
-  EventTelemetry({
+class EventTelemetryItem implements TelemetryItem {
+  /// Creates an instance of [EventTelemetryItem] with the specified [name].
+  EventTelemetryItem({
     @required this.name,
-    this.properties,
+    this.additionalProperties,
     DateTime timestamp,
   })  : assert(name != null),
         assert(timestamp == null || timestamp.isUtc),
@@ -33,11 +39,14 @@ class EventTelemetry implements Telemetry {
   @override
   final DateTime timestamp;
 
+  /// The name of the event.
   final String name;
-  final Map<String, Object> properties;
+
+  /// Any additional properties to submit with the telemetry.
+  final Map<String, Object> additionalProperties;
 
   @override
-  Map<String, dynamic> getDataMap({
+  Map<String, dynamic> serialize({
     @required TelemetryContext context,
   }) =>
       <String, dynamic>{
@@ -46,21 +55,25 @@ class EventTelemetry implements Telemetry {
           'ver': 2,
           'name': name,
           'properties': <String, dynamic>{
-            ...context.additionalProperties,
-            ...?properties,
+            ...context.properties,
+            ...?additionalProperties,
           }
         },
       };
 }
 
+/// Represents an exception telemetry item in Application Insights.
 @immutable
-class ExceptionTelemetry implements Telemetry {
-  ExceptionTelemetry({
+class ExceptionTelemetryItem implements TelemetryItem {
+  /// Creates an instance of [ExceptionTelemetryItem] with the specified [severity] and [error].
+  ///
+  /// If no [problemId] is provided, one will be generated based on the [error] and [stackTrace] (if any) provided.
+  ExceptionTelemetryItem({
     @required this.severity,
     @required this.error,
     this.stackTrace,
     this.problemId,
-    this.properties,
+    this.additionalProperties,
     DateTime timestamp,
   })  : assert(severity != null),
         assert(error != null),
@@ -73,14 +86,24 @@ class ExceptionTelemetry implements Telemetry {
   @override
   final DateTime timestamp;
 
+  /// The severity of the exception.
   final Severity severity;
+
+  /// The underlying error.
   final Object error;
+
+  /// The [StackTrace] captured when the error occurred, which may be `null`.
   final StackTrace stackTrace;
+
+  /// An identifier to associate multiple instances of this error which, if `null`, will cause a problem ID to be
+  /// generated based on the [error] and [stackTrace] (if any) provided.
   final String problemId;
-  final Map<String, Object> properties;
+
+  /// Any additional properties to submit with the telemetry.
+  final Map<String, Object> additionalProperties;
 
   @override
-  Map<String, dynamic> getDataMap({
+  Map<String, dynamic> serialize({
     @required TelemetryContext context,
   }) {
     final trace = stackTrace == null ? null : Trace.parse(stackTrace.toString());
@@ -94,8 +117,8 @@ class ExceptionTelemetry implements Telemetry {
         ],
         'problemId': problemId ?? _generateProblemId(trace),
         'properties': <String, dynamic>{
-          ...context.additionalProperties,
-          ...?properties,
+          ...context.properties,
+          ...?additionalProperties,
         },
       },
     };
@@ -129,14 +152,16 @@ class ExceptionTelemetry implements Telemetry {
       };
 }
 
+/// Represents a page view telemetry item in Application Insights.
 @immutable
-class PageViewTelemetry implements Telemetry {
-  PageViewTelemetry({
+class PageViewTelemetryItem implements TelemetryItem {
+  /// Creates an instance of [PageViewTelemetryItem] with the specified [name].
+  PageViewTelemetryItem({
     @required this.name,
     this.id,
     this.duration,
     this.url,
-    this.properties,
+    this.additionalProperties,
     DateTime timestamp,
   })  : assert(name != null),
         assert(timestamp == null || timestamp.isUtc),
@@ -148,14 +173,23 @@ class PageViewTelemetry implements Telemetry {
   @override
   final DateTime timestamp;
 
+  /// The page name.
   final String name;
+
+  /// How long the page took to display, which may be `null`.
   final Duration duration;
+
+  /// The ID of the page, which may be `null`.
   final String id;
+
+  /// The URL of the page, which may be `null`.
   final String url;
-  final Map<String, Object> properties;
+
+  /// Any additional properties to submit with the telemetry.
+  final Map<String, Object> additionalProperties;
 
   @override
-  Map<String, dynamic> getDataMap({
+  Map<String, dynamic> serialize({
     @required TelemetryContext context,
   }) =>
       <String, dynamic>{
@@ -167,16 +201,18 @@ class PageViewTelemetry implements Telemetry {
           if (duration != null) 'duration': formatDurationForDotNet(duration),
           if (url != null) 'url': url,
           'properties': <String, dynamic>{
-            ...context.additionalProperties,
-            ...?properties,
+            ...context.properties,
+            ...?additionalProperties,
           }
         },
       };
 }
 
+/// Represents a request telemetry item in Application Insights.
 @immutable
-class RequestTelemetry implements Telemetry {
-  RequestTelemetry({
+class RequestTelemetryItem implements TelemetryItem {
+  /// Creates an instance of [RequestTelemetryItem] with the specified [id], [duration], and [responseCode].
+  RequestTelemetryItem({
     @required this.id,
     @required this.duration,
     @required this.responseCode,
@@ -184,7 +220,7 @@ class RequestTelemetry implements Telemetry {
     this.name,
     this.success,
     this.url,
-    this.properties,
+    this.additionalProperties,
     DateTime timestamp,
   })  : assert(id != null),
         assert(duration != null),
@@ -198,17 +234,32 @@ class RequestTelemetry implements Telemetry {
   @override
   final DateTime timestamp;
 
+  /// The ID of the request.
   final String id;
-  final String source;
-  final String name;
+
+  /// The duration of the request.
   final Duration duration;
+
+  /// The response code for the request.
   final String responseCode;
+
+  /// The source of the request, which may be `null`.
+  final String source;
+
+  /// The name of the request, which may be `null`.
+  final String name;
+
+  /// Whether the request was successful or not, which may be `null`.
   final bool success;
+
+  /// The URL of the request, which may be `null`.
   final String url;
-  final Map<String, Object> properties;
+
+  /// Any additional properties to submit with the telemetry.
+  final Map<String, Object> additionalProperties;
 
   @override
-  Map<String, dynamic> getDataMap({
+  Map<String, dynamic> serialize({
     @required TelemetryContext context,
   }) =>
       <String, dynamic>{
@@ -223,19 +274,21 @@ class RequestTelemetry implements Telemetry {
           if (success != null) 'success': success,
           if (url != null) 'url': url,
           'properties': <String, dynamic>{
-            ...context.additionalProperties,
-            ...?properties,
+            ...context.properties,
+            ...?additionalProperties,
           }
         },
       };
 }
 
+/// Represents a trace telemetry item in Application Insights.
 @immutable
-class TraceTelemetry implements Telemetry {
-  TraceTelemetry({
+class TraceTelemetryItem implements TelemetryItem {
+  /// Creates an instance of [TraceTelemetryItem] with the specified [severity] and [message].
+  TraceTelemetryItem({
     @required this.severity,
     @required this.message,
-    this.properties,
+    this.additionalProperties,
     DateTime timestamp,
   })  : assert(severity != null),
         assert(message != null),
@@ -248,12 +301,17 @@ class TraceTelemetry implements Telemetry {
   @override
   final DateTime timestamp;
 
+  /// The trace severity.
   final Severity severity;
+
+  /// The trace message.
   final String message;
-  final Map<String, Object> properties;
+
+  /// Any additional properties to submit with the telemetry.
+  final Map<String, Object> additionalProperties;
 
   @override
-  Map<String, dynamic> getDataMap({
+  Map<String, dynamic> serialize({
     @required TelemetryContext context,
   }) =>
       <String, dynamic>{
@@ -263,22 +321,32 @@ class TraceTelemetry implements Telemetry {
           'severityLevel': severity.intValue,
           'message': message,
           'properties': <String, dynamic>{
-            ...context.additionalProperties,
-            ...?properties,
+            ...context.properties,
+            ...?additionalProperties,
           }
         },
       };
 }
 
+/// Defines severity levels for relevant telemetry items.
 enum Severity {
+  /// Verbose severity.
   verbose,
+
+  /// Informational severity.
   information,
+
+  /// Warning severity.
   warning,
+
+  /// Error severity.
   error,
+
+  /// Critical severity.
   critical,
 }
 
-extension SeverityExtensions on Severity {
+extension _SeverityExtensions on Severity {
   int get intValue {
     switch (this) {
       case Severity.verbose:

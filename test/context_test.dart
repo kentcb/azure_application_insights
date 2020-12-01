@@ -17,7 +17,7 @@ void _verifyContextData({
   @required TelemetryContext context,
   @required String expectedJson,
 }) {
-  final actual = context.getContextMap();
+  final actual = context.properties;
   final actualJson = jsonEncode(actual);
 
   expect(actualJson, expectedJson);

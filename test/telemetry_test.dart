@@ -13,11 +13,11 @@ void main() {
 }
 
 void _verifyDataMap({
-  @required Telemetry telemetry,
+  @required TelemetryItem telemetry,
   @required TelemetryContext context,
   @required String expectedJson,
 }) {
-  final actual = telemetry.getDataMap(context: context);
+  final actual = telemetry.serialize(context: context);
   final actualJson = jsonEncode(actual);
 
   expect(actualJson, expectedJson);
@@ -31,23 +31,23 @@ void _eventTelemetry() {
         'getDataMap',
         () {
           _verifyDataMap(
-            telemetry: EventTelemetry(
+            telemetry: EventTelemetryItem(
               name: 'SomeEvent',
               timestamp: DateTime(2020, 10, 26).toUtc(),
-              properties: const <String, Object>{},
+              additionalProperties: const <String, Object>{},
             ),
             context: TelemetryContext(),
             expectedJson: '{"baseType":"EventData","baseData":{"ver":2,"name":"SomeEvent","properties":{}}}',
           );
 
           _verifyDataMap(
-            telemetry: EventTelemetry(
+            telemetry: EventTelemetryItem(
                 name: 'SomeEvent',
                 timestamp: DateTime(2020, 10, 26).toUtc(),
-                properties: const <String, Object>{
+                additionalProperties: const <String, Object>{
                   'another': 1,
                 }),
-            context: TelemetryContext()..additionalProperties['foo'] = 'bar',
+            context: TelemetryContext()..properties['foo'] = 'bar',
             expectedJson:
                 '{"baseType":"EventData","baseData":{"ver":2,"name":"SomeEvent","properties":{"foo":"bar","another":1}}}',
           );
@@ -65,7 +65,7 @@ void _exceptionTelemetry() {
         'getDataMap',
         () {
           _verifyDataMap(
-            telemetry: ExceptionTelemetry(
+            telemetry: ExceptionTelemetryItem(
               severity: Severity.error,
               error: 'a non-critical error',
             ),
@@ -77,7 +77,7 @@ void _exceptionTelemetry() {
           );
 
           _verifyDataMap(
-            telemetry: ExceptionTelemetry(
+            telemetry: ExceptionTelemetryItem(
               severity: Severity.critical,
               error: 'a critical error',
             ),
@@ -89,7 +89,7 @@ void _exceptionTelemetry() {
           );
 
           _verifyDataMap(
-            telemetry: ExceptionTelemetry(
+            telemetry: ExceptionTelemetryItem(
               severity: Severity.critical,
               error: 'an error with an empty stack trace',
               stackTrace: StackTrace.empty,
@@ -102,7 +102,7 @@ void _exceptionTelemetry() {
           );
 
           _verifyDataMap(
-            telemetry: ExceptionTelemetry(
+            telemetry: ExceptionTelemetryItem(
               severity: Severity.critical,
               error: 'an error with stack trace',
               stackTrace: StackTrace.fromString('#0      _first\n#1      _second'),
@@ -116,14 +116,14 @@ void _exceptionTelemetry() {
           );
 
           _verifyDataMap(
-            telemetry: ExceptionTelemetry(
+            telemetry: ExceptionTelemetryItem(
               severity: Severity.critical,
               error: 'an error with properties',
-              properties: const <String, Object>{
+              additionalProperties: const <String, Object>{
                 'another': 1,
               },
             ),
-            context: TelemetryContext()..additionalProperties['foo'] = 'bar',
+            context: TelemetryContext()..properties['foo'] = 'bar',
             expectedJson:
                 '{"baseType":"ExceptionData","baseData":{"ver":2,"severityLevel":4,"exceptions":[{"typeName":"String",'
                 '"message":"an error with properties","hasFullStack":false}],'
@@ -143,7 +143,7 @@ void _pageViewTelemetry() {
         'getDataMap',
         () {
           _verifyDataMap(
-            telemetry: PageViewTelemetry(
+            telemetry: PageViewTelemetryItem(
               name: 'SomePage',
             ),
             context: TelemetryContext(),
@@ -151,7 +151,7 @@ void _pageViewTelemetry() {
           );
 
           _verifyDataMap(
-            telemetry: PageViewTelemetry(
+            telemetry: PageViewTelemetryItem(
               name: 'SomePageWithId',
               id: 'an-id',
             ),
@@ -161,7 +161,7 @@ void _pageViewTelemetry() {
           );
 
           _verifyDataMap(
-            telemetry: PageViewTelemetry(
+            telemetry: PageViewTelemetryItem(
               name: 'SomePageWithDuration',
               duration: const Duration(milliseconds: 1268),
             ),
@@ -171,7 +171,7 @@ void _pageViewTelemetry() {
           );
 
           _verifyDataMap(
-            telemetry: PageViewTelemetry(
+            telemetry: PageViewTelemetryItem(
               name: 'SomePageWithUrl',
               url: 'http://something/',
             ),
@@ -182,13 +182,13 @@ void _pageViewTelemetry() {
           );
 
           _verifyDataMap(
-            telemetry: PageViewTelemetry(
+            telemetry: PageViewTelemetryItem(
               name: 'SomePageWithProperties',
-              properties: const <String, Object>{
+              additionalProperties: const <String, Object>{
                 'another': 1,
               },
             ),
-            context: TelemetryContext()..additionalProperties['foo'] = 'bar',
+            context: TelemetryContext()..properties['foo'] = 'bar',
             expectedJson: '{"baseType":"PageViewData","baseData":{"ver":2,"name":"SomePageWithProperties","properties":'
                 '{"foo":"bar","another":1}}}',
           );
@@ -206,7 +206,7 @@ void _requestTelemetry() {
         'getDataMap',
         () {
           _verifyDataMap(
-            telemetry: RequestTelemetry(
+            telemetry: RequestTelemetryItem(
               id: 'request-id',
               duration: const Duration(milliseconds: 2301),
               responseCode: '200',
@@ -218,7 +218,7 @@ void _requestTelemetry() {
           );
 
           _verifyDataMap(
-            telemetry: RequestTelemetry(
+            telemetry: RequestTelemetryItem(
               id: 'request-with-source',
               duration: const Duration(milliseconds: 2301),
               responseCode: '200',
@@ -231,7 +231,7 @@ void _requestTelemetry() {
           );
 
           _verifyDataMap(
-            telemetry: RequestTelemetry(
+            telemetry: RequestTelemetryItem(
               id: 'request-with-name',
               duration: const Duration(milliseconds: 2301),
               responseCode: '200',
@@ -244,7 +244,7 @@ void _requestTelemetry() {
           );
 
           _verifyDataMap(
-            telemetry: RequestTelemetry(
+            telemetry: RequestTelemetryItem(
               id: 'request-with-success',
               duration: const Duration(milliseconds: 2301),
               responseCode: '200',
@@ -257,7 +257,7 @@ void _requestTelemetry() {
           );
 
           _verifyDataMap(
-            telemetry: RequestTelemetry(
+            telemetry: RequestTelemetryItem(
               id: 'request-with-url',
               duration: const Duration(milliseconds: 2301),
               responseCode: '200',
@@ -270,15 +270,15 @@ void _requestTelemetry() {
           );
 
           _verifyDataMap(
-            telemetry: RequestTelemetry(
+            telemetry: RequestTelemetryItem(
               id: 'request-with-properties',
               duration: const Duration(milliseconds: 2301),
               responseCode: '200',
-              properties: const <String, Object>{
+              additionalProperties: const <String, Object>{
                 'another': 1,
               },
             ),
-            context: TelemetryContext()..additionalProperties['foo'] = 'bar',
+            context: TelemetryContext()..properties['foo'] = 'bar',
             expectedJson:
                 '{"baseType":"RequestData","baseData":{"ver":2,"id":"request-with-properties","duration":"00:00:02.301000"'
                 ',"responseCode":"200","properties":{"foo":"bar","another":1}}}',
@@ -297,7 +297,7 @@ void _traceTelemetry() {
         'getDataMap',
         () {
           _verifyDataMap(
-            telemetry: TraceTelemetry(
+            telemetry: TraceTelemetryItem(
               severity: Severity.critical,
               message: 'a trace',
             ),
@@ -307,7 +307,7 @@ void _traceTelemetry() {
           );
 
           _verifyDataMap(
-            telemetry: TraceTelemetry(
+            telemetry: TraceTelemetryItem(
               severity: Severity.information,
               message: 'a trace with different severity',
             ),
@@ -318,14 +318,14 @@ void _traceTelemetry() {
           );
 
           _verifyDataMap(
-            telemetry: TraceTelemetry(
+            telemetry: TraceTelemetryItem(
               severity: Severity.critical,
               message: 'a trace with properties',
-              properties: const <String, Object>{
+              additionalProperties: const <String, Object>{
                 'another': 1,
               },
             ),
-            context: TelemetryContext()..additionalProperties['foo'] = 'bar',
+            context: TelemetryContext()..properties['foo'] = 'bar',
             expectedJson:
                 '{"baseType":"MessageData","baseData":{"ver":2,"severityLevel":4,"message":"a trace with properties",'
                 '"properties":{"foo":"bar","another":1}}}',
