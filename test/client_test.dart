@@ -23,7 +23,7 @@ void _constructor() {
       test(
         'an empty context is created by default',
         () {
-          final processor = ProcessorMock();
+          final processor = MockProcessor();
           final sut = TelemetryClient(processor: processor);
 
           expect(sut.context.properties.isEmpty, true);
@@ -35,7 +35,7 @@ void _constructor() {
         () {
           final context = TelemetryContext();
           context.properties['foo'] = 42;
-          final processor = ProcessorMock();
+          final processor = MockProcessor();
           final sut = TelemetryClient(
             processor: processor,
             context: context,
@@ -55,7 +55,7 @@ void _trackError() {
       test(
         'creates exception telemetry and forwards to processor',
         () {
-          final processor = ProcessorMock();
+          final processor = MockProcessor();
           final sut = TelemetryClient(processor: processor);
           sut.trackError(
             severity: Severity.critical,
@@ -96,7 +96,7 @@ void _trackEvent() {
       test(
         'creates event telemetry and forwards to processor',
         () {
-          final processor = ProcessorMock();
+          final processor = MockProcessor();
           final sut = TelemetryClient(processor: processor);
           sut.trackEvent(
             name: 'an event',
@@ -135,7 +135,7 @@ void _trackPageView() {
       test(
         'creates page view telemetry and forwards to processor',
         () {
-          final processor = ProcessorMock();
+          final processor = MockProcessor();
           final sut = TelemetryClient(processor: processor);
           sut.trackPageView(
             name: 'a page',
@@ -174,7 +174,7 @@ void _trackRequest() {
       test(
         'creates request telemetry and forwards to processor',
         () {
-          final processor = ProcessorMock();
+          final processor = MockProcessor();
           final sut = TelemetryClient(processor: processor);
           sut.trackRequest(
             id: 'a request',
@@ -217,7 +217,7 @@ void _trackTrace() {
       test(
         'creates trace telemetry and forwards to processor',
         () {
-          final processor = ProcessorMock();
+          final processor = MockProcessor();
           final sut = TelemetryClient(processor: processor);
           sut.trackTrace(
             severity: Severity.critical,
@@ -258,7 +258,7 @@ void _flush() {
       test(
         'forwards to processor',
         () async {
-          final processor = ProcessorMock();
+          final processor = MockProcessor();
           final sut = TelemetryClient(processor: processor);
           await sut.flush();
 

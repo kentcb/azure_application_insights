@@ -1,31 +1,43 @@
 import 'package:azure_application_insights/azure_application_insights.dart';
 import 'package:http/http.dart';
+import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'mocks.mocks.dart';
 
-class ProcessorMock extends Mock implements Processor {}
+export 'mocks.mocks.dart';
 
-class StreamMock extends Mock implements Stream {}
-
-class StreamedResponseMock extends Mock implements StreamedResponse {
-  StreamedResponseMock() {
-    when(stream).thenAnswer((_) => ByteStream.fromBytes([]));
-    when(statusCode).thenReturn(200);
-  }
-}
-
-class ResponseMock extends Mock implements Response {}
-
-class ClientMock extends Mock implements Client {
-  ClientMock() {
+@GenerateMocks(
+  [
+    Processor,
+    Response,
+    TelemetryClient,
+  ],
+  customMocks: [
+    MockSpec<Client>(as: #MockClientBase),
+    MockSpec<StreamedResponse>(as: #MockStreamedResponseBase),
+  ],
+)
+class MockClient extends MockClientBase {
+  MockClient() {
     when(send(
       any,
-    )).thenAnswer((realInvocation) => Future.value(StreamedResponseMock()));
+    )).thenAnswer((realInvocation) => Future.value(MockStreamedResponse()));
 
     when(this.post(
       any,
       body: anyNamed('body'),
-    )).thenAnswer((realInvocation) => Future.value(ResponseMock()));
+    )).thenAnswer((realInvocation) => Future.value(MockResponse()));
   }
 }
 
-class TelemetryClientMock extends Mock implements TelemetryClient {}
+class MockStreamedResponse extends MockStreamedResponseBase {
+  MockStreamedResponse() {
+    when(request).thenAnswer((_) => null);
+    when(headers).thenAnswer((_) => const <String, String>{});
+    when(isRedirect).thenAnswer((_) => false);
+    when(persistentConnection).thenAnswer((_) => false);
+    when(reasonPhrase).thenAnswer((_) => null);
+    when(stream).thenAnswer((_) => ByteStream.fromBytes([]));
+    when(statusCode).thenReturn(200);
+  }
+}

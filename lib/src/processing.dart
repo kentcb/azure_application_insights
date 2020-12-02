@@ -14,11 +14,11 @@ import 'telemetry.dart';
 /// pattern, with [next] being the subsequent processor in the chain. This allows a set of processors to be composed.
 abstract class Processor {
   /// The next processor in the chain, or `null` if there is none.
-  Processor get next;
+  Processor? get next;
 
   /// Requests that [contextualTelemetryItems] be processed by this [Processor].
   void process({
-    @required List<ContextualTelemetryItem> contextualTelemetryItems,
+    required List<ContextualTelemetryItem> contextualTelemetryItems,
   });
 
   /// Instructs the processor to force all telemetry items to be handled regardless of any internal buffering logic,
@@ -31,10 +31,9 @@ abstract class Processor {
 class ContextualTelemetryItem {
   /// Creates a new instance of [ContextualTelemetryItem].
   const ContextualTelemetryItem({
-    @required this.telemetryItem,
-    @required this.context,
-  })  : assert(telemetryItem != null),
-        assert(context != null);
+    required this.telemetryItem,
+    required this.context,
+  });
 
   /// The telemetry.
   final TelemetryItem telemetryItem;
@@ -54,14 +53,12 @@ class BufferedProcessor implements Processor {
     this.next,
     this.capacity = 50,
     this.flushDelay = const Duration(seconds: 30),
-  })  : assert(capacity != null),
-        assert(capacity > 0),
-        assert(flushDelay != null),
+  })  : assert(capacity > 0),
         assert(flushDelay >= Duration.zero),
         _buffer = <ContextualTelemetryItem>[];
 
   @override
-  final Processor next;
+  final Processor? next;
 
   /// The capacity of the buffer which, once filled, will be immediately forwarded to [next].
   final int capacity;
@@ -70,17 +67,15 @@ class BufferedProcessor implements Processor {
   final Duration flushDelay;
 
   final List<ContextualTelemetryItem> _buffer;
-  Timer _flushTimer;
+  Timer? _flushTimer;
 
   /// Add [contextualTelemetryItems] to the buffer, automatically forwarding telemetry if the buffer is full.
   ///
   /// Even if the buffer is not filled, it will eventually be forwarded once [flushDelay] elapses.
   @override
   void process({
-    @required List<ContextualTelemetryItem> contextualTelemetryItems,
+    required List<ContextualTelemetryItem> contextualTelemetryItems,
   }) {
-    assert(contextualTelemetryItems != null);
-
     for (final contextualTelemetryItem in contextualTelemetryItems) {
       _buffer.add(contextualTelemetryItem);
 
@@ -107,6 +102,8 @@ class BufferedProcessor implements Processor {
       final bufferClone = List<ContextualTelemetryItem>.from(_buffer);
       _buffer.clear();
 
+      final next = this.next;
+
       if (next != null) {
         next.process(
           contextualTelemetryItems: bufferClone,
@@ -125,17 +122,16 @@ class BufferedProcessor implements Processor {
 /// A [Processor] that sends telemetry to the Azure Application Insights instance associated with [instrumentationKey].
 class TransmissionProcessor implements Processor {
   TransmissionProcessor({
-    @required this.instrumentationKey,
-    @required this.httpClient,
-    @required this.timeout,
+    required this.instrumentationKey,
+    required this.httpClient,
+    required this.timeout,
     this.next,
-  })  : assert(instrumentationKey != null),
-        assert(httpClient != null),
-        assert(timeout != null),
-        _outstandingFutures = <Future<void>>{};
+  }) : _outstandingFutures = <Future<void>>{};
+
+  static final _trackUri = Uri.parse('https://dc.services.visualstudio.com/v2/track');
 
   @override
-  final Processor next;
+  final Processor? next;
 
   /// The Application Insights instrumentation key to use when submitting telemetry.
   final String instrumentationKey;
@@ -154,16 +150,14 @@ class TransmissionProcessor implements Processor {
   /// Sends [contextualTelemetryItems] to Application Insights, then on to [next].
   @override
   void process({
-    @required List<ContextualTelemetryItem> contextualTelemetryItems,
+    required List<ContextualTelemetryItem> contextualTelemetryItems,
   }) {
     final future = _transmit(
       contextualTelemetry: contextualTelemetryItems,
     );
 
-    if (future != null) {
-      _outstandingFutures.add(future);
-      future.whenComplete(() => _outstandingFutures.remove(future));
-    }
+    _outstandingFutures.add(future);
+    future.whenComplete(() => _outstandingFutures.remove(future));
 
     next?.process(
       contextualTelemetryItems: contextualTelemetryItems,
@@ -172,15 +166,18 @@ class TransmissionProcessor implements Processor {
 
   /// Waits for any in flight telemetry submission, as well as flushing [next].
   @override
-  Future<void> flush() => Future.wait([
-        ..._outstandingFutures,
-        if (next != null) next.flush(),
-      ]);
+  Future<void> flush() {
+    final next = this.next;
+
+    return Future.wait([
+      ..._outstandingFutures,
+      if (next != null) next.flush(),
+    ]);
+  }
 
   Future<void> _transmit({
-    @required List<ContextualTelemetryItem> contextualTelemetry,
+    required List<ContextualTelemetryItem> contextualTelemetry,
   }) async {
-    assert(contextualTelemetry != null);
     print('Transmitting ${contextualTelemetry.length} telemetry items');
 
     final serialized = _serializeTelemetry(
@@ -191,7 +188,7 @@ class TransmissionProcessor implements Processor {
     try {
       final response = await httpClient
           .post(
-            'https://dc.services.visualstudio.com/v2/track',
+            _trackUri,
             body: encoded,
           )
           .timeout(timeout);
@@ -206,10 +203,8 @@ class TransmissionProcessor implements Processor {
   }
 
   List<Map<String, dynamic>> _serializeTelemetry({
-    @required List<ContextualTelemetryItem> contextualTelemetry,
+    required List<ContextualTelemetryItem> contextualTelemetry,
   }) {
-    assert(contextualTelemetry != null);
-
     final result = contextualTelemetry
         .map((t) => _serializeTelemetryItem(
               contextualTelemetry: t,
@@ -219,15 +214,11 @@ class TransmissionProcessor implements Processor {
   }
 
   Map<String, dynamic> _serializeTelemetryItem({
-    @required ContextualTelemetryItem contextualTelemetry,
+    required ContextualTelemetryItem contextualTelemetry,
   }) {
-    assert(contextualTelemetry != null);
-
-    final serializedTelemetry = contextualTelemetry.telemetryItem
-        .serialize(context: contextualTelemetry.context);
+    final serializedTelemetry = contextualTelemetry.telemetryItem.serialize(context: contextualTelemetry.context);
     final contextProperties = contextualTelemetry.context.properties;
-    final serializedContext =
-        contextProperties.isEmpty ? null : contextProperties;
+    final serializedContext = contextProperties.isEmpty ? null : contextProperties;
     final result = <String, dynamic>{
       'name': contextualTelemetry.telemetryItem.envelopeName,
       'time': contextualTelemetry.telemetryItem.timestamp.toIso8601String(),
@@ -250,20 +241,18 @@ class DebugProcessor implements Processor {
   });
 
   @override
-  final Processor next;
+  final Processor? next;
 
   /// Outputs a message detailing the telemetry being processed, then forwards the telemetry onto [next].
   @override
   void process({
-    @required List<ContextualTelemetryItem> contextualTelemetryItems,
+    required List<ContextualTelemetryItem> contextualTelemetryItems,
   }) {
-    assert(contextualTelemetryItems != null);
-
     print('Processing ${contextualTelemetryItems.length} telemetry items:');
 
     for (final contextualTelemetryItem in contextualTelemetryItems) {
-      final json = jsonEncode(contextualTelemetryItem.telemetryItem
-          .serialize(context: contextualTelemetryItem.context));
+      final json =
+          jsonEncode(contextualTelemetryItem.telemetryItem.serialize(context: contextualTelemetryItem.context));
       print('  - ${contextualTelemetryItem.telemetryItem.runtimeType}: $json');
     }
 
@@ -274,9 +263,7 @@ class DebugProcessor implements Processor {
 
   /// Outputs a message, then forwards onto [next].
   @override
-  Future<void> flush({
-    @required TelemetryContext context,
-  }) async {
+  Future<void> flush() async {
     print('Flushing');
     await next?.flush();
   }

@@ -17,7 +17,7 @@ abstract class TelemetryItem {
 
   /// Gets a serialized representation of this telemetry.
   Map<String, dynamic> serialize({
-    @required TelemetryContext context,
+    required TelemetryContext context,
   });
 }
 
@@ -26,11 +26,10 @@ abstract class TelemetryItem {
 class EventTelemetryItem implements TelemetryItem {
   /// Creates an instance of [EventTelemetryItem] with the specified [name].
   EventTelemetryItem({
-    @required this.name,
-    this.additionalProperties,
-    DateTime timestamp,
-  })  : assert(name != null),
-        assert(timestamp == null || timestamp.isUtc),
+    required this.name,
+    this.additionalProperties = const <String, Object>{},
+    DateTime? timestamp,
+  })  : assert(timestamp == null || timestamp.isUtc),
         timestamp = timestamp ?? DateTime.now().toUtc();
 
   @override
@@ -47,7 +46,7 @@ class EventTelemetryItem implements TelemetryItem {
 
   @override
   Map<String, dynamic> serialize({
-    @required TelemetryContext context,
+    required TelemetryContext context,
   }) =>
       <String, dynamic>{
         'baseType': 'EventData',
@@ -56,7 +55,7 @@ class EventTelemetryItem implements TelemetryItem {
           'name': name,
           'properties': <String, dynamic>{
             ...context.properties,
-            ...?additionalProperties,
+            ...additionalProperties,
           }
         },
       };
@@ -69,15 +68,13 @@ class ExceptionTelemetryItem implements TelemetryItem {
   ///
   /// If no [problemId] is provided, one will be generated based on the [error] and [stackTrace] (if any) provided.
   ExceptionTelemetryItem({
-    @required this.severity,
-    @required this.error,
+    required this.severity,
+    required this.error,
     this.stackTrace,
     this.problemId,
-    this.additionalProperties,
-    DateTime timestamp,
-  })  : assert(severity != null),
-        assert(error != null),
-        assert(timestamp == null || timestamp.isUtc),
+    this.additionalProperties = const <String, Object>{},
+    DateTime? timestamp,
+  })  : assert(timestamp == null || timestamp.isUtc),
         timestamp = timestamp ?? DateTime.now().toUtc();
 
   @override
@@ -92,19 +89,19 @@ class ExceptionTelemetryItem implements TelemetryItem {
   /// The underlying error.
   final Object error;
 
-  /// The [StackTrace] captured when the error occurred, which may be `null`.
-  final StackTrace stackTrace;
+  /// The [StackTrace] captured when the error occurred, if any.
+  final StackTrace? stackTrace;
 
   /// An identifier to associate multiple instances of this error which, if `null`, will cause a problem ID to be
   /// generated based on the [error] and [stackTrace] (if any) provided.
-  final String problemId;
+  final String? problemId;
 
   /// Any additional properties to submit with the telemetry.
   final Map<String, Object> additionalProperties;
 
   @override
   Map<String, dynamic> serialize({
-    @required TelemetryContext context,
+    required TelemetryContext context,
   }) {
     final trace =
         stackTrace == null ? null : Trace.parse(stackTrace.toString());
@@ -119,13 +116,13 @@ class ExceptionTelemetryItem implements TelemetryItem {
         'problemId': problemId ?? _generateProblemId(trace),
         'properties': <String, dynamic>{
           ...context.properties,
-          ...?additionalProperties,
+          ...additionalProperties,
         },
       },
     };
   }
 
-  String _generateProblemId(Trace trace) {
+  String _generateProblemId(Trace? trace) {
     // Make a best effort at disambiguating errors by using the error message and the first frame from any available stack trace.
     final code =
         '$error${trace == null || trace.frames.isEmpty ? '' : trace.frames[0].toString()}';
@@ -135,7 +132,7 @@ class ExceptionTelemetryItem implements TelemetryItem {
     return result;
   }
 
-  Map<String, dynamic> _getErrorDataMap(Trace trace) => <String, dynamic>{
+  Map<String, dynamic> _getErrorDataMap(Trace? trace) => <String, dynamic>{
         'typeName': error.runtimeType.toString(),
         'message': error.toString(),
         'hasFullStack': trace != null,
@@ -159,14 +156,13 @@ class ExceptionTelemetryItem implements TelemetryItem {
 class PageViewTelemetryItem implements TelemetryItem {
   /// Creates an instance of [PageViewTelemetryItem] with the specified [name].
   PageViewTelemetryItem({
-    @required this.name,
+    required this.name,
     this.id,
     this.duration,
     this.url,
-    this.additionalProperties,
-    DateTime timestamp,
-  })  : assert(name != null),
-        assert(timestamp == null || timestamp.isUtc),
+    this.additionalProperties = const <String, Object>{},
+    DateTime? timestamp,
+  })  : assert(timestamp == null || timestamp.isUtc),
         timestamp = timestamp ?? DateTime.now().toUtc();
 
   @override
@@ -178,21 +174,21 @@ class PageViewTelemetryItem implements TelemetryItem {
   /// The page name.
   final String name;
 
-  /// How long the page took to display, which may be `null`.
-  final Duration duration;
+  /// How long the page took to display, which is optional.
+  final Duration? duration;
 
-  /// The ID of the page, which may be `null`.
-  final String id;
+  /// The ID of the page, which is optional.
+  final String? id;
 
-  /// The URL of the page, which may be `null`.
-  final String url;
+  /// The URL of the page, which is optional.
+  final String? url;
 
   /// Any additional properties to submit with the telemetry.
   final Map<String, Object> additionalProperties;
 
   @override
   Map<String, dynamic> serialize({
-    @required TelemetryContext context,
+    required TelemetryContext context,
   }) =>
       <String, dynamic>{
         'baseType': 'PageViewData',
@@ -204,7 +200,7 @@ class PageViewTelemetryItem implements TelemetryItem {
           if (url != null) 'url': url,
           'properties': <String, dynamic>{
             ...context.properties,
-            ...?additionalProperties,
+            ...additionalProperties,
           }
         },
       };
@@ -215,19 +211,16 @@ class PageViewTelemetryItem implements TelemetryItem {
 class RequestTelemetryItem implements TelemetryItem {
   /// Creates an instance of [RequestTelemetryItem] with the specified [id], [duration], and [responseCode].
   RequestTelemetryItem({
-    @required this.id,
-    @required this.duration,
-    @required this.responseCode,
+    required this.id,
+    required this.duration,
+    required this.responseCode,
     this.source,
     this.name,
     this.success,
     this.url,
-    this.additionalProperties,
-    DateTime timestamp,
-  })  : assert(id != null),
-        assert(duration != null),
-        assert(responseCode != null),
-        assert(timestamp == null || timestamp.isUtc),
+    this.additionalProperties = const <String, Object>{},
+    DateTime? timestamp,
+  })  : assert(timestamp == null || timestamp.isUtc),
         timestamp = timestamp ?? DateTime.now().toUtc();
 
   @override
@@ -245,24 +238,24 @@ class RequestTelemetryItem implements TelemetryItem {
   /// The response code for the request.
   final String responseCode;
 
-  /// The source of the request, which may be `null`.
-  final String source;
+  /// The source of the request, which is optional.
+  final String? source;
 
-  /// The name of the request, which may be `null`.
-  final String name;
+  /// The name of the request, which is optional.
+  final String? name;
 
-  /// Whether the request was successful or not, which may be `null`.
-  final bool success;
+  /// Whether the request was successful or not, which is optional.
+  final bool? success;
 
-  /// The URL of the request, which may be `null`.
-  final String url;
+  /// The URL of the request, which is optional.
+  final String? url;
 
   /// Any additional properties to submit with the telemetry.
   final Map<String, Object> additionalProperties;
 
   @override
   Map<String, dynamic> serialize({
-    @required TelemetryContext context,
+    required TelemetryContext context,
   }) =>
       <String, dynamic>{
         'baseType': 'RequestData',
@@ -277,7 +270,7 @@ class RequestTelemetryItem implements TelemetryItem {
           if (url != null) 'url': url,
           'properties': <String, dynamic>{
             ...context.properties,
-            ...?additionalProperties,
+            ...additionalProperties,
           }
         },
       };
@@ -288,13 +281,11 @@ class RequestTelemetryItem implements TelemetryItem {
 class TraceTelemetryItem implements TelemetryItem {
   /// Creates an instance of [TraceTelemetryItem] with the specified [severity] and [message].
   TraceTelemetryItem({
-    @required this.severity,
-    @required this.message,
-    this.additionalProperties,
-    DateTime timestamp,
-  })  : assert(severity != null),
-        assert(message != null),
-        assert(timestamp == null || timestamp.isUtc),
+    required this.severity,
+    required this.message,
+    this.additionalProperties = const <String, Object>{},
+    DateTime? timestamp,
+  })  : assert(timestamp == null || timestamp.isUtc),
         timestamp = timestamp ?? DateTime.now().toUtc();
 
   @override
@@ -314,7 +305,7 @@ class TraceTelemetryItem implements TelemetryItem {
 
   @override
   Map<String, dynamic> serialize({
-    @required TelemetryContext context,
+    required TelemetryContext context,
   }) =>
       <String, dynamic>{
         'baseType': 'MessageData',
@@ -324,7 +315,7 @@ class TraceTelemetryItem implements TelemetryItem {
           'message': message,
           'properties': <String, dynamic>{
             ...context.properties,
-            ...?additionalProperties,
+            ...additionalProperties,
           }
         },
       };

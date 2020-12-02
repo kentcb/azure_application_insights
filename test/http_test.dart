@@ -19,12 +19,18 @@ void _telemetryHttpClient() {
       test(
         'requests are forwarded to inner',
         () async {
-          final inner = ClientMock();
+          final response = MockStreamedResponse();
+
+          final inner = MockClient();
+          when(inner.send(
+            any,
+          )).thenAnswer((realInvocation) => Future.value(response));
+
           final sut = TelemetryHttpClient(
             inner: inner,
-            telemetryClient: TelemetryClientMock(),
+            telemetryClient: MockTelemetryClient(),
           );
-          await sut.get('http://www.whatever.com');
+          await sut.get(Uri.parse('http://www.whatever.com'));
 
           verify(inner.send(any)).called(1);
         },
@@ -33,12 +39,12 @@ void _telemetryHttpClient() {
       test(
         'request URLs are recorded',
         () async {
-          final telemetryClient = TelemetryClientMock();
+          final telemetryClient = MockTelemetryClient();
           final sut = TelemetryHttpClient(
-            inner: ClientMock(),
+            inner: MockClient(),
             telemetryClient: telemetryClient,
           );
-          await sut.get('http://www.whatever.com');
+          await sut.get(Uri.parse('http://www.whatever.com'));
 
           expect(
             verify(
@@ -65,13 +71,13 @@ void _telemetryHttpClient() {
       //   () {
       //     FakeAsync().run(
       //       (async) {
-      //         final inner = ClientMock();
+      //         final inner = MockClient();
       //         when(inner.send(any)).thenAnswer((_) {
       //           async.elapse(const Duration(seconds: 3));
-      //           return Future.value(StreamedResponseMock());
+      //           return Future.value(MockStreamedResponse());
       //         });
 
-      //         final telemetryClient = TelemetryClientMock();
+      //         final telemetryClient = MockTelemetryClient();
       //         final sut = TelemetryHttpClient(
       //           inner: inner,
       //           telemetryClient: telemetryClient,
@@ -102,22 +108,22 @@ void _telemetryHttpClient() {
         'response codes are recorded',
         () async {
           Future<void> verifyStatusCode({
-            int statusCode,
-            bool isSuccess,
+            required int statusCode,
+            required bool isSuccess,
           }) async {
-            final streamedResponse = StreamedResponseMock();
+            final streamedResponse = MockStreamedResponse();
             when(streamedResponse.statusCode).thenReturn(statusCode);
-            final inner = ClientMock();
+            final inner = MockClient();
             when(inner.send(
               any,
             )).thenAnswer((realInvocation) => Future.value(streamedResponse));
 
-            final telemetryClient = TelemetryClientMock();
+            final telemetryClient = MockTelemetryClient();
             final sut = TelemetryHttpClient(
               inner: inner,
               telemetryClient: telemetryClient,
             );
-            await sut.get('http://www.whatever.com');
+            await sut.get(Uri.parse('http://www.whatever.com'));
 
             final captured = verify(
               telemetryClient.trackRequest(
@@ -131,7 +137,7 @@ void _telemetryHttpClient() {
               ),
             ).captured;
 
-            expect(captured[0], statusCode?.toString());
+            expect(captured[0], statusCode.toString());
             expect(captured[1], isSuccess);
           }
 
@@ -157,14 +163,14 @@ void _telemetryHttpClient() {
       test(
         'properties are recorded',
         () async {
-          final inner = ClientMock();
-          final telemetryClient = TelemetryClientMock();
+          final inner = MockClient();
+          final telemetryClient = MockTelemetryClient();
           final sut = TelemetryHttpClient(
             inner: inner,
             telemetryClient: telemetryClient,
           );
           await sut.post(
-            'http://www.whatever.com',
+            Uri.parse('http://www.whatever.com'),
             headers: <String, String>{
               'first': 'value1',
               'second': 'value2',
@@ -195,14 +201,14 @@ void _telemetryHttpClient() {
       test(
         'timestamp is recorded',
         () async {
-          final inner = ClientMock();
-          final telemetryClient = TelemetryClientMock();
+          final inner = MockClient();
+          final telemetryClient = MockTelemetryClient();
           final sut = TelemetryHttpClient(
             inner: inner,
             telemetryClient: telemetryClient,
           );
           await sut.post(
-            'http://www.whatever.com',
+            Uri.parse('http://www.whatever.com'),
             headers: <String, String>{
               'first': 'value1',
               'second': 'value2',
