@@ -1,6 +1,7 @@
+import 'dart:math';
+
 import 'package:http/http.dart';
 import 'package:meta/meta.dart';
-import 'package:uuid/uuid.dart';
 
 import 'client.dart';
 
@@ -32,7 +33,7 @@ class TelemetryHttpClient extends BaseClient {
     final response = await inner.send(request);
     stopwatch.stop();
     telemetryClient.trackRequest(
-      id: Uuid().v4().toString(),
+      id: _generateRequestId(),
       url: request.url.toString(),
       duration: stopwatch.elapsed,
       responseCode: response?.statusCode?.toString(),
@@ -47,4 +48,19 @@ class TelemetryHttpClient extends BaseClient {
 
     return response;
   }
+}
+
+// We generate our own request IDs rather than depending on an external package so that we reduce dependencies. At
+// the time of writing, the uuid package did not support null safety, and I want this package to ASAP.
+String _generateRequestId() {
+  const chars = '0123456789abcdefghijklmnopqrstuvwxyz';
+
+  final random = Random.secure();
+  final result = StringBuffer();
+
+  for (var i = 0; i < 16; ++i) {
+    result.write(chars[random.nextInt(chars.length)]);
+  }
+
+  return result.toString();
 }
