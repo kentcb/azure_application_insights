@@ -11,7 +11,10 @@
       "avatar_url": "https://avatars2.githubusercontent.com/u/1901832?v=4",
       "profile": "http://kent-boogaart.com/",
       "contributions": [
-        "code"
+        "code",
+        "test",
+        "doc",
+        "example"
       ]
     }
   ],
