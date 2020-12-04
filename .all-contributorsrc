@@ -1,0 +1,24 @@
+{
+  "files": [
+    "README.md"
+  ],
+  "imageSize": 100,
+  "commit": false,
+  "contributors": [
+    {
+      "login": "kentcb",
+      "name": "Kent Boogaart",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/1901832?v=4",
+      "profile": "http://kent-boogaart.com/",
+      "contributions": [
+        "code"
+      ]
+    }
+  ],
+  "contributorsPerLine": 7,
+  "projectName": "azure_application_insights",
+  "projectOwner": "kentcb",
+  "repoType": "github",
+  "repoHost": "https://github.com",
+  "skipCi": true
+}
