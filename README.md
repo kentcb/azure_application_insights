@@ -1,10 +1,8 @@
 # Azure Application Insights
+[![pub package](https://img.shields.io/pub/v/azure_application_insights.svg)](https://pub.dartlang.org/packages/azure_application_insights)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
-
-[![pub package](https://img.shields.io/pub/v/azure_application_insights.svg)](https://pub.dartlang.org/packages/azure_application_insights)
-
 
 ## What?
 
@@ -78,9 +76,6 @@ await telemetryHttpClient.get('https://kent-boogaart.com/');
 The `TelemetryHttpClient` could be one piece in a long chain of HTTP middleware - it is composable.
 
 ## Who?
-
-
-## Contributors ✨
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 
