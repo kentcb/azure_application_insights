@@ -106,7 +106,8 @@ class ExceptionTelemetryItem implements TelemetryItem {
   Map<String, dynamic> serialize({
     @required TelemetryContext context,
   }) {
-    final trace = stackTrace == null ? null : Trace.parse(stackTrace.toString());
+    final trace =
+        stackTrace == null ? null : Trace.parse(stackTrace.toString());
     return <String, dynamic>{
       'baseType': 'ExceptionData',
       'baseData': <String, dynamic>{
@@ -126,7 +127,8 @@ class ExceptionTelemetryItem implements TelemetryItem {
 
   String _generateProblemId(Trace trace) {
     // Make a best effort at disambiguating errors by using the error message and the first frame from any available stack trace.
-    final code = '$error${trace == null || trace.frames.isEmpty ? '' : trace.frames[0].toString()}';
+    final code =
+        '$error${trace == null || trace.frames.isEmpty ? '' : trace.frames[0].toString()}';
     final codeBytes = utf8.encode(code);
     final hash = sha1.convert(codeBytes);
     final result = hash.toString();
