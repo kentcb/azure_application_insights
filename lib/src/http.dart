@@ -37,10 +37,12 @@ class TelemetryHttpClient extends BaseClient {
       url: request.url.toString(),
       duration: stopwatch.elapsed,
       responseCode: response?.statusCode?.toString(),
-      success: response?.statusCode != null && (response.statusCode >= 200 && response.statusCode < 300),
+      success: response?.statusCode != null &&
+          (response.statusCode >= 200 && response.statusCode < 300),
       additionalProperties: <String, Object>{
         'method': request.method,
-        'headers': request.headers.entries.map((e) => '${e.key}=${e.value}').join(','),
+        'headers':
+            request.headers.entries.map((e) => '${e.key}=${e.value}').join(','),
         'contentLength': request.contentLength,
       },
       timestamp: timestamp,

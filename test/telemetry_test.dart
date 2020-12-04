@@ -37,7 +37,8 @@ void _eventTelemetry() {
               additionalProperties: const <String, Object>{},
             ),
             context: TelemetryContext(),
-            expectedJson: '{"baseType":"EventData","baseData":{"ver":2,"name":"SomeEvent","properties":{}}}',
+            expectedJson:
+                '{"baseType":"EventData","baseData":{"ver":2,"name":"SomeEvent","properties":{}}}',
           );
 
           _verifyDataMap(
@@ -105,7 +106,8 @@ void _exceptionTelemetry() {
             telemetry: ExceptionTelemetryItem(
               severity: Severity.critical,
               error: 'an error with stack trace',
-              stackTrace: StackTrace.fromString('#0      _first\n#1      _second'),
+              stackTrace:
+                  StackTrace.fromString('#0      _first\n#1      _second'),
             ),
             context: TelemetryContext(),
             expectedJson:
@@ -147,7 +149,8 @@ void _pageViewTelemetry() {
               name: 'SomePage',
             ),
             context: TelemetryContext(),
-            expectedJson: '{"baseType":"PageViewData","baseData":{"ver":2,"name":"SomePage","properties":{}}}',
+            expectedJson:
+                '{"baseType":"PageViewData","baseData":{"ver":2,"name":"SomePage","properties":{}}}',
           );
 
           _verifyDataMap(
@@ -166,7 +169,8 @@ void _pageViewTelemetry() {
               duration: const Duration(milliseconds: 1268),
             ),
             context: TelemetryContext(),
-            expectedJson: '{"baseType":"PageViewData","baseData":{"ver":2,"name":"SomePageWithDuration","duration":'
+            expectedJson:
+                '{"baseType":"PageViewData","baseData":{"ver":2,"name":"SomePageWithDuration","duration":'
                 '"00:00:01.268000","properties":{}}}',
           );
 
@@ -189,7 +193,8 @@ void _pageViewTelemetry() {
               },
             ),
             context: TelemetryContext()..properties['foo'] = 'bar',
-            expectedJson: '{"baseType":"PageViewData","baseData":{"ver":2,"name":"SomePageWithProperties","properties":'
+            expectedJson:
+                '{"baseType":"PageViewData","baseData":{"ver":2,"name":"SomePageWithProperties","properties":'
                 '{"foo":"bar","another":1}}}',
           );
         },
