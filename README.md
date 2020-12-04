@@ -84,7 +84,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 <!-- markdownlint-disable -->
 <table>
   <tr>
-    <td align="center"><a href="http://kent-boogaart.com/"><img src="https://avatars2.githubusercontent.com/u/1901832?v=4" width="100px;" alt=""/><br /><sub><b>Kent Boogaart</b></sub></a><br /><a href="https://github.com/kentcb/azure_application_insights/commits?author=kentcb" title="Code">💻</a></td>
+    <td align="center"><a href="http://kent-boogaart.com/"><img src="https://avatars2.githubusercontent.com/u/1901832?v=4" width="100px;" alt=""/><br /><sub><b>Kent Boogaart</b></sub></a><br /><a href="https://github.com/kentcb/azure_application_insights/commits?author=kentcb" title="Code">💻</a> <a href="https://github.com/kentcb/azure_application_insights/commits?author=kentcb" title="Tests">⚠️</a> <a href="https://github.com/kentcb/azure_application_insights/commits?author=kentcb" title="Documentation">📖</a> <a href="#example-kentcb" title="Examples">💡</a></td>
   </tr>
 </table>
 
