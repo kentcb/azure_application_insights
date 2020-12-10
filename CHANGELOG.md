@@ -1,3 +1,7 @@
+## 1.0.3
+
+- Further relax dependencies
+
 ## 1.0.2
 
 - Relax dependencies
