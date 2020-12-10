@@ -1,3 +1,7 @@
+## 1.0.2
+
+- Relax dependencies
+
 ## 1.0.1
 
 - Pub score fixes
