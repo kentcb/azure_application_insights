@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:azure_application_insights/azure_application_insights.dart';
-import 'package:meta/meta.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -14,8 +13,8 @@ void main() {
 }
 
 void _verifyContextData({
-  @required TelemetryContext context,
-  @required String expectedJson,
+  required TelemetryContext context,
+  required String expectedJson,
 }) {
   final actual = context.properties;
   final actualJson = jsonEncode(actual);

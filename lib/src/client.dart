@@ -1,4 +1,3 @@
-import 'package:meta/meta.dart';
 import 'context.dart';
 import 'http.dart';
 import 'processing.dart';
@@ -35,8 +34,8 @@ class TelemetryClient {
   /// Callers can optionally specify a [context] to use, which facilitates sharing a single [TelemetryContext]
   /// between multiple [TelemetryClient] instances. If unspecified, a new [TelemetryContext] will be created instead.
   TelemetryClient({
-    @required this.processor,
-    TelemetryContext context,
+    required this.processor,
+    TelemetryContext? context,
   }) : context = context ?? TelemetryContext();
 
   /// A [Processor] that receives all telemetry items created by this [TelemetryClient].
@@ -53,12 +52,12 @@ class TelemetryClient {
 
   /// Creates an [ExceptionTelemetryItem] item and forwards it onto the [processor].
   void trackError({
-    @required Severity severity,
-    @required Object error,
-    StackTrace stackTrace,
-    String problemId,
-    Map<String, Object> additionalProperties,
-    DateTime timestamp,
+    required Severity severity,
+    required Object error,
+    StackTrace? stackTrace,
+    String? problemId,
+    Map<String, Object> additionalProperties = const <String, Object>{},
+    DateTime? timestamp,
   }) =>
       _track(ExceptionTelemetryItem(
         severity: severity,
@@ -71,9 +70,9 @@ class TelemetryClient {
 
   /// Creates an [EventTelemetryItem] item and forwards it onto the [processor].
   void trackEvent({
-    @required String name,
-    Map<String, Object> additionalProperties,
-    DateTime timestamp,
+    required String name,
+    Map<String, Object> additionalProperties = const <String, Object>{},
+    DateTime? timestamp,
   }) =>
       _track(EventTelemetryItem(
         name: name,
@@ -83,12 +82,12 @@ class TelemetryClient {
 
   /// Creates a [PageViewTelemetryItem] item and forwards it onto the [processor].
   void trackPageView({
-    @required String name,
-    String id,
-    Duration duration,
-    String url,
-    Map<String, Object> additionalProperties,
-    DateTime timestamp,
+    required String name,
+    String? id,
+    Duration? duration,
+    String? url,
+    Map<String, Object> additionalProperties = const <String, Object>{},
+    DateTime? timestamp,
   }) =>
       _track(PageViewTelemetryItem(
         duration: duration,
@@ -101,15 +100,15 @@ class TelemetryClient {
 
   /// Creates a [RequestTelemetryItem] item and forwards it onto the [processor].
   void trackRequest({
-    @required String id,
-    @required Duration duration,
-    @required String responseCode,
-    String source,
-    String name,
-    bool success,
-    String url,
-    Map<String, Object> additionalProperties,
-    DateTime timestamp,
+    required String id,
+    required Duration duration,
+    required String responseCode,
+    String? source,
+    String? name,
+    bool? success,
+    String? url,
+    Map<String, Object> additionalProperties = const <String, Object>{},
+    DateTime? timestamp,
   }) =>
       _track(RequestTelemetryItem(
         duration: duration,
@@ -125,10 +124,10 @@ class TelemetryClient {
 
   /// Creates a [TraceTelemetryItem] item and forwards it onto the [processor].
   void trackTrace({
-    @required Severity severity,
-    @required String message,
-    Map<String, Object> additionalProperties,
-    DateTime timestamp,
+    required Severity severity,
+    required String message,
+    Map<String, Object> additionalProperties = const <String, Object>{},
+    DateTime? timestamp,
   }) =>
       _track(TraceTelemetryItem(
         severity: severity,
@@ -138,19 +137,17 @@ class TelemetryClient {
       ));
 
   void _track(TelemetryItem telemetry) {
-    assert(telemetry != null);
-
     // We clone the context at this point so that any mutations prior to processing do not affect the outcome.
     final contextualTelemetry = ContextualTelemetryItem(
       telemetryItem: telemetry,
       context: context.clone(),
     );
 
-    processor?.process(
+    processor.process(
       contextualTelemetryItems: [contextualTelemetry],
     );
   }
 
   /// Flushes this [TelemetryClient]'s [processor].
-  Future<void> flush() => processor?.flush() ?? Future<void>.value(null);
+  Future<void> flush() => processor.flush();
 }

@@ -94,7 +94,7 @@ Future<void> _sendTelemetry() async {
       telemetryClient: telemetryClient,
       inner: client,
     );
-    await telemetryHttpClient.get('https://kent-boogaart.com/');
+    await telemetryHttpClient.get(Uri.parse('https://kent-boogaart.com/'));
 
     // Because we're about to exit, we need to flush the telemetry client to force it to process all items.
     await telemetryClient.flush();

@@ -1,7 +1,6 @@
 import 'dart:math';
 
 import 'package:http/http.dart';
-import 'package:meta/meta.dart';
 
 import 'client.dart';
 
@@ -15,10 +14,9 @@ class TelemetryHttpClient extends BaseClient {
   /// Create an instance of [TelemetryHttpClient] that forwards HTTP requests onto [inner] and telemetry items onto
   /// [telemetryClient].
   TelemetryHttpClient({
-    @required this.inner,
-    @required this.telemetryClient,
-  })  : assert(inner != null),
-        assert(telemetryClient != null);
+    required this.inner,
+    required this.telemetryClient,
+  });
 
   /// The inner HTTP client.
   final Client inner;
@@ -31,19 +29,18 @@ class TelemetryHttpClient extends BaseClient {
     final stopwatch = Stopwatch()..start();
     final timestamp = DateTime.now().toUtc();
     final response = await inner.send(request);
+    final contentLength = request.contentLength;
     stopwatch.stop();
     telemetryClient.trackRequest(
       id: _generateRequestId(),
       url: request.url.toString(),
       duration: stopwatch.elapsed,
-      responseCode: response?.statusCode?.toString(),
-      success: response?.statusCode != null &&
-          (response.statusCode >= 200 && response.statusCode < 300),
+      responseCode: response.statusCode.toString(),
+      success: response.statusCode >= 200 && response.statusCode < 300,
       additionalProperties: <String, Object>{
         'method': request.method,
-        'headers':
-            request.headers.entries.map((e) => '${e.key}=${e.value}').join(','),
-        'contentLength': request.contentLength,
+        'headers': request.headers.entries.map((e) => '${e.key}=${e.value}').join(','),
+        if (contentLength != null) 'contentLength': contentLength,
       },
       timestamp: timestamp,
     );

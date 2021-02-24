@@ -19,7 +19,7 @@ void _bufferedProcessor() {
       test(
         'process buffers flushes synchronously if delay is zero',
         () {
-          final next = ProcessorMock();
+          final next = MockProcessor();
           final sut = BufferedProcessor(
             capacity: 10,
             flushDelay: Duration.zero,
@@ -44,7 +44,7 @@ void _bufferedProcessor() {
       test(
         'process buffers flushes synchronously if the capacity is surpassed',
         () {
-          final next = ProcessorMock();
+          final next = MockProcessor();
           final sut = BufferedProcessor(
             capacity: 1,
             flushDelay: const Duration(seconds: 10),
@@ -75,7 +75,7 @@ void _bufferedProcessor() {
         () {
           FakeAsync().run(
             (async) {
-              final next = ProcessorMock();
+              final next = MockProcessor();
               final sut = BufferedProcessor(
                 capacity: 10,
                 flushDelay: const Duration(seconds: 10),
@@ -110,7 +110,7 @@ void _bufferedProcessor() {
       test(
         'flush does nothing if the buffer is empty',
         () {
-          final next = ProcessorMock();
+          final next = MockProcessor();
           final sut = BufferedProcessor(
             next: next,
           );
@@ -124,7 +124,7 @@ void _bufferedProcessor() {
       test(
         'flush immediately forwards pending telemetry',
         () {
-          final next = ProcessorMock();
+          final next = MockProcessor();
           final sut = BufferedProcessor(
             flushDelay: const Duration(seconds: 10),
             next: next,
@@ -158,7 +158,7 @@ void _transmissionProcessor() {
       test(
         'process asynchronously transmits telemetry via HTTP',
         () {
-          final httpClient = ClientMock();
+          final httpClient = MockClient();
           final sut = TransmissionProcessor(
             instrumentationKey: 'key',
             httpClient: httpClient,
@@ -189,8 +189,8 @@ void _transmissionProcessor() {
       test(
         'process synchronously forwards telemetry onto next',
         () {
-          final httpClient = ClientMock();
-          final next = ProcessorMock();
+          final httpClient = MockClient();
+          final next = MockProcessor();
           final sut = TransmissionProcessor(
             instrumentationKey: 'key',
             httpClient: httpClient,
