@@ -14,11 +14,10 @@ Application Insights is a powerful tool for understanding how your software syst
 
 ## Where?
 
-You can install this library via pub by adding the following to your `pubspec.yaml`:
+Firstly, [install the azure_application_insights package](https://pub.dev/packages/azure_application_insights/install), then you can import it into your Dart code as follows:
 
-```yaml
-dependencies:
-  azure_application_insights: ^1.0.0
+```dart
+import 'package:azure_application_insights/azure_application_insights.dart';
 ```
 
 ## How?
@@ -56,6 +55,70 @@ You may also want to configure additional properties to be submitted with teleme
 
 1. On the `TelemetryContext` associated with your `TelemetryClient`. Properties in this context object will be attached to every telemetry item submitted. Moreover, you can share a `TelemetryContext` between multiple `TelemetryClient` instances if desired.
 2. Every method on `TelemetryClient` allows you to specify `additionalProperties` that will be captured only for that telemetry item. As the name suggests, these properties are in addition to those within the context.
+
+### Flutter Integration
+
+To submit crashes in Flutter applications as telemetry, follow the following recipe:
+
+```dart
+Future<void> runWithCrashReporting({
+  required VoidCallback codeToExecute,
+}) async {
+  // Hook into Flutter error handling.
+  FlutterError.onError = (details) => submitErrorAsTelemetry(
+        isFatal: true,
+        error: details.exception,
+        trace: details.stack,
+      );
+
+  // Run the code to execute in a zone and handle all errors within.
+  runZonedGuarded(
+    codeToExecute,
+    (error, trace) => submitErrorAsTelemetry(
+      isFatal: true,
+      error: error,
+      trace: trace,
+    ),
+  );
+}
+
+Future<void> submitErrorAsTelemetry({
+  required bool isFatal,
+  required Object error,
+  required StackTrace trace,
+}) async {
+  debugPrint('reporting ${isFatal ? 'fatal' : 'non-fatal'} error: $error');
+  debugPrint('$trace');
+
+  try {
+    // Get your TelemetryClient instance here, perhaps by DI or some other mechanism.
+    final telemetryClient = ...;
+
+    // Get any additional properties for the crash report here, such as device information.
+    final errorProperties = ...;
+
+    // Write an error telemetry item.
+    telemetryClient.trackError(
+      error: error,
+      stackTrace: trace,
+      severity: isFatal ? Severity.critical : Severity.error,
+      additionalProperties: errorProperties,
+    );
+
+    if (isFatal) {
+      await telemetryClient.flush();
+    }
+  } on Object catch (e, t) {
+    // We print synchronously here to ensure the output is written in the case we force exit.
+    debugPrintSynchronously('Sending error telemetry failed: $e\r\n$t');
+    debugPrintSynchronously('Original error: $error');
+  } finally {
+    if (isFatal && kReleaseMode) {
+      debugPrintSynchronously('Forcing exit');
+    }
+  }
+}
+```
 
 ### HTTP Middleware
 
