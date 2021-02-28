@@ -61,6 +61,19 @@ You may also want to configure additional properties to be submitted with teleme
 To submit crashes in Flutter applications as telemetry, follow the following recipe:
 
 ```dart
+void main() {
+    // You probably don't want to always run with crash reporting because it interferes with the normal
+    // debug/development experience. Here we use kReleaseMode to only enable crash reporting for release builds, but
+    // you can use whatever criteria and mechanism you like.
+    if (kReleaseMode) {
+        runWithCrashReporting(codeToExecute: run);
+    } else {
+        run();
+    }
+}
+
+void run() => runApp(MyApp());
+
 Future<void> runWithCrashReporting({
   required VoidCallback codeToExecute,
 }) async {
