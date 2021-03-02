@@ -128,7 +128,8 @@ class TransmissionProcessor implements Processor {
     this.next,
   }) : _outstandingFutures = <Future<void>>{};
 
-  static final _trackUri = Uri.parse('https://dc.services.visualstudio.com/v2/track');
+  static final _trackUri =
+      Uri.parse('https://dc.services.visualstudio.com/v2/track');
 
   @override
   final Processor? next;
@@ -216,9 +217,11 @@ class TransmissionProcessor implements Processor {
   Map<String, dynamic> _serializeTelemetryItem({
     required ContextualTelemetryItem contextualTelemetry,
   }) {
-    final serializedTelemetry = contextualTelemetry.telemetryItem.serialize(context: contextualTelemetry.context);
+    final serializedTelemetry = contextualTelemetry.telemetryItem
+        .serialize(context: contextualTelemetry.context);
     final contextProperties = contextualTelemetry.context.properties;
-    final serializedContext = contextProperties.isEmpty ? null : contextProperties;
+    final serializedContext =
+        contextProperties.isEmpty ? null : contextProperties;
     final result = <String, dynamic>{
       'name': contextualTelemetry.telemetryItem.envelopeName,
       'time': contextualTelemetry.telemetryItem.timestamp.toIso8601String(),
@@ -251,8 +254,8 @@ class DebugProcessor implements Processor {
     print('Processing ${contextualTelemetryItems.length} telemetry items:');
 
     for (final contextualTelemetryItem in contextualTelemetryItems) {
-      final json =
-          jsonEncode(contextualTelemetryItem.telemetryItem.serialize(context: contextualTelemetryItem.context));
+      final json = jsonEncode(contextualTelemetryItem.telemetryItem
+          .serialize(context: contextualTelemetryItem.context));
       print('  - ${contextualTelemetryItem.telemetryItem.runtimeType}: $json');
     }
 
