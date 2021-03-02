@@ -1,0 +1,45 @@
+name: Dart
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: beta
+
+      - name: Install dependencies
+        run: dart pub get
+
+      - name: Run tests
+        run: dart test
+
+      - name: Analyze package with Pana
+        run: |
+          pub global activate pana
+
+          REQUIRED_RATIO=1.0
+          TEMP_FILE=/tmp/pana_results.txt
+
+          # Run pana, piping the output to both stderr and into a grep to find the result in the last line.
+          pana --no-warning | tee /dev/stderr | tail -1 | grep -o -E '[0-9]+' > $TEMP_FILE
+
+          # Extract score and calculate ratio.
+          SCORE=$(cat $TEMP_FILE | head -1)
+          TOTAL=$(cat $TEMP_FILE | tail -1)
+          RATIO=$(echo "scale=2; $SCORE / $TOTAL" | bc -l)
+          MEETS_REQUIRED_RATIO=$(echo "$RATIO >= $REQUIRED_RATIO" | bc -l)
+
+          if [[ "$MEETS_REQUIRED_RATIO" != "1" ]]; then
+            echo "Score of $SCORE out of $TOTAL is a ratio of $RATIO, which is not sufficient to meet the required ratio of $REQUIRED_RATIO"
+            exit 1
+          fi
