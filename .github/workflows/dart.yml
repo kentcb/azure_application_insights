@@ -33,4 +33,5 @@ jobs:
           flutter pub global activate pana
 
           # Require full points to pass.
+          # TODO: have to set to 1 until this is merged: https://github.com/dart-lang/pana/pull/924
           pana --no-warning --exit-code-threshold=1
