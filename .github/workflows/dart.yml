@@ -13,14 +13,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      # - uses: dart-lang/setup-dart@v1
-      #   with:
-      #     sdk: beta
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: beta
 
       # Required in lieu of https://github.com/dart-lang/pana/issues/843
-      - uses: subosito/flutter-action@v1
-        with:
-          channel: stable
+      #- uses: subosito/flutter-action@v1
+      #  with:
+      #    channel: stable
 
       - name: Install dependencies
         run: dart pub get
@@ -30,7 +30,7 @@ jobs:
 
       - name: Analyze package with Pana
         run: |
-          flutter pub global activate pana
+          pub global activate pana
 
           # Require full points to pass.
           # TODO: have to set to 1 until this is merged: https://github.com/dart-lang/pana/pull/924

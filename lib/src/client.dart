@@ -52,7 +52,8 @@ class TelemetryClient {
 
   /// Creates an [ExceptionTelemetryItem] item and forwards it onto the [processor].
   void trackError({
-    required Severity severity,required Object error,
+    required Severity severity,
+    required Object error,
     StackTrace? stackTrace,
     String? problemId,
     Map<String, Object> additionalProperties = const <String, Object>{},
