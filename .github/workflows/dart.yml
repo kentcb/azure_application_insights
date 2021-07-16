@@ -32,4 +32,5 @@ jobs:
         run: |
           flutter pub global activate pana
 
-          pana --no-warning --exit-code-threshold=100
+          # Require full points to pass.
+          pana --no-warning --exit-code-threshold=1
