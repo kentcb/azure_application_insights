@@ -59,6 +59,33 @@ You may also want to configure additional properties to be submitted with teleme
 1. On the `TelemetryContext` associated with your `TelemetryClient`. Properties in this context object will be attached to every telemetry item submitted. Moreover, you can share a `TelemetryContext` between multiple `TelemetryClient` instances if desired.
 2. Every method on `TelemetryClient` allows you to specify `additionalProperties` that will be captured only for that telemetry item. As the name suggests, these properties are in addition to those within the context.
 
+Here are examples of both:
+
+```dart
+final telemetryClient = ...;
+
+// 1. Properties associated with the TelemetryClient will be attached to
+// all telemetry items submitted via that client.
+telemetryClient.context
+    // These built-in helpers simply set the pre-defined properties
+    // Application Insights provides.
+    ..applicationVersion = 'my version'
+    ..device.type = 'Android';
+    // But you can also set whatever property name you like.
+    ..properties['environmentName'] = 'dev';
+
+// 2. Additional properties can be bundled with individual telemetry items.
+telemetryClient.traceTrace(
+    severity: Severity.information,
+    message: 'An example',
+    additionalProperties: <String, Object>{
+        'answer': 42,
+    },
+);
+```
+
+Of course, you can leverage whatever data sources and third party libraries make sense in order to populate properties. Typically you would use a package like [`device_info_plus`](https://pub.dev/packages/device_info_plus) to obtain information on the device and fill in the appropriate properties on the context.
+
 ### Flutter Integration
 
 To submit crashes in Flutter applications as telemetry, follow the following recipe:
