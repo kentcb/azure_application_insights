@@ -63,9 +63,7 @@ void _trackError() {
           );
 
           expect(
-            verify(processor.process(
-                    contextualTelemetryItems:
-                        captureAnyNamed('contextualTelemetryItems')))
+            verify(processor.process(contextualTelemetryItems: captureAnyNamed('contextualTelemetryItems')))
                 .captured
                 .single,
             predicate<List<ContextualTelemetryItem>>((v) {
@@ -76,8 +74,7 @@ void _trackError() {
               final telemetry = v[0].telemetryItem;
 
               if (telemetry is ExceptionTelemetryItem) {
-                return telemetry.severity == Severity.critical &&
-                    telemetry.error == 'an error';
+                return telemetry.severity == Severity.critical && telemetry.error == 'an error';
               }
 
               return false;
@@ -103,9 +100,7 @@ void _trackEvent() {
           );
 
           expect(
-            verify(processor.process(
-                    contextualTelemetryItems:
-                        captureAnyNamed('contextualTelemetryItems')))
+            verify(processor.process(contextualTelemetryItems: captureAnyNamed('contextualTelemetryItems')))
                 .captured
                 .single,
             predicate<List<ContextualTelemetryItem>>((v) {
@@ -142,9 +137,7 @@ void _trackPageView() {
           );
 
           expect(
-            verify(processor.process(
-                    contextualTelemetryItems:
-                        captureAnyNamed('contextualTelemetryItems')))
+            verify(processor.process(contextualTelemetryItems: captureAnyNamed('contextualTelemetryItems')))
                 .captured
                 .single,
             predicate<List<ContextualTelemetryItem>>((v) {
@@ -183,9 +176,7 @@ void _trackRequest() {
           );
 
           expect(
-            verify(processor.process(
-                    contextualTelemetryItems:
-                        captureAnyNamed('contextualTelemetryItems')))
+            verify(processor.process(contextualTelemetryItems: captureAnyNamed('contextualTelemetryItems')))
                 .captured
                 .single,
             predicate<List<ContextualTelemetryItem>>((v) {
@@ -225,9 +216,7 @@ void _trackTrace() {
           );
 
           expect(
-            verify(processor.process(
-                    contextualTelemetryItems:
-                        captureAnyNamed('contextualTelemetryItems')))
+            verify(processor.process(contextualTelemetryItems: captureAnyNamed('contextualTelemetryItems')))
                 .captured
                 .single,
             predicate<List<ContextualTelemetryItem>>((v) {
@@ -238,8 +227,7 @@ void _trackTrace() {
               final telemetry = v[0].telemetryItem;
 
               if (telemetry is TraceTelemetryItem) {
-                return telemetry.severity == Severity.critical &&
-                    telemetry.message == 'a message';
+                return telemetry.severity == Severity.critical && telemetry.message == 'a message';
               }
 
               return false;
