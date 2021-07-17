@@ -29,4 +29,4 @@ jobs:
           # TODO: this should be set to zero, but it needs to be 10 until these PRs are merged:
           # - https://github.com/dart-lang/pana/pull/924
           # - https://github.com/dart-lang/pana/pull/925
-          pana --no-warning --exit-code-threshold=10
+          pana --no-warning --line-length=120 --exit-code-threshold=10

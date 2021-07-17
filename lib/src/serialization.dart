@@ -33,9 +33,7 @@ String? formatDurationForDotNet(Duration? duration) {
   final days = duration.inDays;
 
   if (days > 0) {
-    result
-      ..write(days)
-      ..write('.');
+    result..write(days)..write('.');
   }
 
   writePadded(result, duration.inHours.remainder(24));
