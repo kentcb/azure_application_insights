@@ -1,3 +1,7 @@
+## 2.1.0
+
+- Ability to specify the ingestion endpoint
+
 ## 2.0.0
 
 - Null safety
