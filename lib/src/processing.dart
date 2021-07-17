@@ -119,22 +119,26 @@ class BufferedProcessor implements Processor {
   }
 }
 
-/// A [Processor] that sends telemetry to the Azure Application Insights instance associated with [instrumentationKey].
+/// A [Processor] that sends telemetry to the Azure Application Insights instance associated with [instrumentationKey]
+/// at endpoint [ingestionEndpoint].
 class TransmissionProcessor implements Processor {
   TransmissionProcessor({
     required this.instrumentationKey,
     required this.httpClient,
     required this.timeout,
+    this.ingestionEndpoint = 'https://dc.services.visualstudio.com/v2/track',
     this.next,
-  }) : _outstandingFutures = <Future<void>>{};
-
-  static final _trackUri = Uri.parse('https://dc.services.visualstudio.com/v2/track');
+  })  : _ingestionEndpointUri = Uri.parse(ingestionEndpoint),
+        _outstandingFutures = <Future<void>>{};
 
   @override
   final Processor? next;
 
   /// The Application Insights instrumentation key to use when submitting telemetry.
   final String instrumentationKey;
+
+  /// The endpoint to which data is sent.
+  final String ingestionEndpoint;
 
   /// The HTTP client to use when submitting telemetry.
   ///
@@ -145,6 +149,7 @@ class TransmissionProcessor implements Processor {
   /// How long to wait before timing out on telemetry submission.
   final Duration timeout;
 
+  final Uri _ingestionEndpointUri;
   final Set<Future<void>> _outstandingFutures;
 
   /// Sends [contextualTelemetryItems] to Application Insights, then on to [next].
@@ -188,7 +193,7 @@ class TransmissionProcessor implements Processor {
     try {
       final response = await httpClient
           .post(
-            _trackUri,
+            _ingestionEndpointUri,
             body: encoded,
           )
           .timeout(timeout);

@@ -40,6 +40,9 @@ final telemetryClient = TelemetryClient(
 );
 ```
 
+> NOTE: depending on your Azure environment, you may also wish to override the default ingestion endpoint. To do this,
+> provide a value for the `ingestionEndpoint` parameter when creating a `TransmissionProcessor`.
+
 This is a typical setup where telemetry items are buffered before being transmitted. Depending on your processing needs, you may have a need for more than one `TelemetryClient` in your application. For example, you might have one `TelemetryClient` that buffers telemetry items and is used for all telemetry other than errors, and a second that does not buffer and is used only to submit errors as promptly as possible. Please review the example code and API docs for alternative configurations.
 
 Once you have a `TelemetryClient`, you can simply invoke the various methods to capture telemetry items:
