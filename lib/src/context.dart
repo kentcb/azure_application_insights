@@ -9,6 +9,9 @@ import 'client.dart';
 /// easily get or set contextual information for commonly-known Application Insights properties without needing to know
 /// the property keys. All properties, regardless of whether they're well-known or custom ones, can also be accessed
 /// via [properties].
+///
+/// See also:
+/// * [Public schema for Application Insights context tag keys](https://github.com/microsoft/ApplicationInsights-dotnet/blob/405fd6a9916956f2233520c8ab66110a1f9dcfbc/WEB/Schema/PublicSchema/ContextTagKeys.bond)
 class TelemetryContext {
   /// Creates an instance of [TelemetryContext] that is initially empty.
   TelemetryContext() : this._(<String, dynamic>{});
@@ -293,7 +296,7 @@ class UserContext {
   final Map<String, dynamic> _contextMap;
   static const _prefix = 'ai.user.';
   static const _accountIdKey = '${_prefix}accountId';
-  static const _userIdKey = '${_prefix}userId';
+  static const _userIdKey = '${_prefix}id';
   static const _authUserIdKey = '${_prefix}authUserId';
 
   /// The user account ID to attach to telemetry items.
