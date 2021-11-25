@@ -113,7 +113,7 @@ void _userContext() {
           ..user.accountId = 'account id'
           ..user.authUserId = 'auth user id'
           ..user.id = 'id',
-        expectedJson: '{"ai.user.accountId":"account id","ai.user.authUserId":"auth user id","ai.user.userId":"id"}',
+        expectedJson: '{"ai.user.accountId":"account id","ai.user.authUserId":"auth user id","ai.user.id":"id"}',
       );
     },
   );
