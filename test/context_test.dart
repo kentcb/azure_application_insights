@@ -32,6 +32,13 @@ void _cloudContext() {
           ..cloud.roleInstance = 'role instance',
         expectedJson: '{"ai.cloud.role":"role","ai.cloud.roleInstance":"role instance"}',
       );
+      _verifyContextData(
+        context: TelemetryContext()
+          ..cloud.role = 'role'
+          ..cloud.roleInstance = 'role instance'
+          ..cloud.role = null,
+        expectedJson: '{"ai.cloud.roleInstance":"role instance"}',
+      );
     },
   );
 }
