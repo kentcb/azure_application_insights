@@ -38,7 +38,8 @@ class TelemetryHttpClient extends BaseClient {
       success: response.statusCode >= 200 && response.statusCode < 300,
       additionalProperties: <String, Object>{
         'method': request.method,
-        'headers': request.headers.entries.map((e) => '${e.key}=${e.value}').join(','),
+        'headers':
+            request.headers.entries.map((e) => '${e.key}=${e.value}').join(','),
         if (contentLength != null) 'contentLength': contentLength,
       },
       timestamp: timestamp,

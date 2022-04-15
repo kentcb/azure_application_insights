@@ -229,9 +229,11 @@ class TransmissionProcessor implements Processor {
   Map<String, dynamic> _serializeTelemetryItem({
     required ContextualTelemetryItem contextualTelemetry,
   }) {
-    final serializedTelemetry = contextualTelemetry.telemetryItem.serialize(context: contextualTelemetry.context);
+    final serializedTelemetry = contextualTelemetry.telemetryItem
+        .serialize(context: contextualTelemetry.context);
     final contextProperties = contextualTelemetry.context.properties;
-    final serializedContext = contextProperties.isEmpty ? null : contextProperties;
+    final serializedContext =
+        contextProperties.isEmpty ? null : contextProperties;
     final result = <String, dynamic>{
       'name': contextualTelemetry.telemetryItem.envelopeName,
       'time': contextualTelemetry.telemetryItem.timestamp.toIso8601String(),
@@ -268,12 +270,14 @@ class DebugProcessor implements Processor {
   void process({
     required List<ContextualTelemetryItem> contextualTelemetryItems,
   }) {
-    logger.info('Processing ${contextualTelemetryItems.length} telemetry items:');
+    logger
+        .info('Processing ${contextualTelemetryItems.length} telemetry items:');
 
     for (final contextualTelemetryItem in contextualTelemetryItems) {
-      final json =
-          jsonEncode(contextualTelemetryItem.telemetryItem.serialize(context: contextualTelemetryItem.context));
-      logger.info('  - ${contextualTelemetryItem.telemetryItem.runtimeType}: $json');
+      final json = jsonEncode(contextualTelemetryItem.telemetryItem
+          .serialize(context: contextualTelemetryItem.context));
+      logger.info(
+          '  - ${contextualTelemetryItem.telemetryItem.runtimeType}: $json');
     }
 
     next?.process(
