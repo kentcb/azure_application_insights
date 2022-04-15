@@ -278,12 +278,12 @@ class SessionContext {
   set sessionId(String? value) => _contextMap.setOrRemove(_idKey, value);
 
   /// The session "is first" flag to attach to telemetry items.
-  bool get isFirst => _contextMap[_isFirstKey];
+  bool? get isFirst => _contextMap[_isFirstKey];
 
   /// Setting will change the session "is first" flag attached to telemetry items submitted with this context.
   ///
   /// This is a convenience for setting the `ai.session.isFirst` key on [TelemetryContext.properties].
-  set isFirst(bool value) => _contextMap.setOrRemove(_isFirstKey, value);
+  set isFirst(bool? value) => _contextMap.setOrRemove(_isFirstKey, value);
 
   /// Remove session properties from the associated [TelemetryContext.properties].
   void clear() => _contextMap.removeWhere((key, dynamic value) => key.startsWith(_prefix));
@@ -328,5 +328,5 @@ class UserContext {
 }
 
 extension _MapExtensions<K, V> on Map<K, V> {
-  void setOrRemove(K key, V? value) => value == null ? remove(key) : this[key] = value;
+  void setOrRemove(K key, V value) => value == null ? remove(key) : this[key] = value;
 }
