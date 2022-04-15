@@ -16,6 +16,15 @@
         "doc",
         "example"
       ]
+    },
+    {
+      "login": "mernen",
+      "name": "Daniel Luz",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6412?v=4",
+      "profile": "https://mernen.com/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
