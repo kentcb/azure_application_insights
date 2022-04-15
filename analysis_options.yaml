@@ -7,3 +7,6 @@ analyzer:
 linter:
   rules:
     # See https://dart-lang.github.io/linter/lints/options/options.html
+
+    # Dart format removes trailing comma in many cases. This rule is experimental so I suspect it won't give false positives in future.
+    require_trailing_commas: false
