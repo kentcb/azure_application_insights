@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:azure_application_insights/src/client.dart';
+import 'package:azure_application_insights/src/context.dart';
+import 'package:azure_application_insights/src/http.dart';
+import 'package:azure_application_insights/src/telemetry.dart';
 import 'package:http/http.dart';
+import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
-import 'client.dart';
-import 'context.dart';
-import 'http.dart';
-import 'telemetry.dart';
 
 /// Used by a [TelemetryClient] to process telemetry items.
 ///
@@ -126,9 +127,11 @@ class TransmissionProcessor implements Processor {
     required this.instrumentationKey,
     required this.httpClient,
     required this.timeout,
+    Logger? logger,
     this.ingestionEndpoint = 'https://dc.services.visualstudio.com/v2/track',
     this.next,
-  })  : _ingestionEndpointUri = Uri.parse(ingestionEndpoint),
+  })  : logger = logger ?? Logger('TransmissionProcessor'),
+        _ingestionEndpointUri = Uri.parse(ingestionEndpoint),
         _outstandingFutures = <Future<void>>{};
 
   @override
@@ -148,6 +151,9 @@ class TransmissionProcessor implements Processor {
 
   /// How long to wait before timing out on telemetry submission.
   final Duration timeout;
+
+  /// A [Logger] to which processing information will be written.
+  final Logger logger;
 
   final Uri _ingestionEndpointUri;
   final Set<Future<void>> _outstandingFutures;
@@ -183,7 +189,7 @@ class TransmissionProcessor implements Processor {
   Future<void> _transmit({
     required List<ContextualTelemetryItem> contextualTelemetry,
   }) async {
-    print('Transmitting ${contextualTelemetry.length} telemetry items');
+    logger.fine('Transmitting ${contextualTelemetry.length} telemetry items');
 
     final serialized = _serializeTelemetry(
       contextualTelemetry: contextualTelemetry,
@@ -200,10 +206,10 @@ class TransmissionProcessor implements Processor {
       final result = response.statusCode >= 200 && response.statusCode < 300;
 
       if (!result) {
-        print('Failed to submit telemetry: ${response.statusCode}');
+        logger.severe('Failed to submit telemetry: ${response.statusCode}');
       }
     } on Object catch (e) {
-      print('Failed to submit telemetry: $e');
+      logger.warning('Failed to submit telemetry: $e');
     }
   }
 
@@ -211,9 +217,11 @@ class TransmissionProcessor implements Processor {
     required List<ContextualTelemetryItem> contextualTelemetry,
   }) {
     final result = contextualTelemetry
-        .map((t) => _serializeTelemetryItem(
-              contextualTelemetry: t,
-            ))
+        .map(
+          (t) => _serializeTelemetryItem(
+            contextualTelemetry: t,
+          ),
+        )
         .toList(growable: false);
     return result;
   }
@@ -239,26 +247,33 @@ class TransmissionProcessor implements Processor {
 }
 
 /// A [Processor] that outputs messages that are useful in diagnosing telemetry processing.
+///
+/// Messages are output to the provided [logger], or to a default [Logger] if none is provided. All log messages are at
+/// the [Level.INFO] level.
 class DebugProcessor implements Processor {
   /// Creates an instance of [DebugProcessor].
   DebugProcessor({
     this.next,
-  });
+    Logger? logger,
+  }) : logger = logger ?? Logger('DebugProcessor');
 
   @override
   final Processor? next;
+
+  /// A [Logger] to which processing information will be written.
+  final Logger logger;
 
   /// Outputs a message detailing the telemetry being processed, then forwards the telemetry onto [next].
   @override
   void process({
     required List<ContextualTelemetryItem> contextualTelemetryItems,
   }) {
-    print('Processing ${contextualTelemetryItems.length} telemetry items:');
+    logger.info('Processing ${contextualTelemetryItems.length} telemetry items:');
 
     for (final contextualTelemetryItem in contextualTelemetryItems) {
       final json =
           jsonEncode(contextualTelemetryItem.telemetryItem.serialize(context: contextualTelemetryItem.context));
-      print('  - ${contextualTelemetryItem.telemetryItem.runtimeType}: $json');
+      logger.info('  - ${contextualTelemetryItem.telemetryItem.runtimeType}: $json');
     }
 
     next?.process(
@@ -269,7 +284,7 @@ class DebugProcessor implements Processor {
   /// Outputs a message, then forwards onto [next].
   @override
   Future<void> flush() async {
-    print('Flushing');
+    logger.info('Flushing');
     await next?.flush();
   }
 }

@@ -2,6 +2,7 @@ import 'package:azure_application_insights/azure_application_insights.dart';
 import 'package:http/http.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+
 import 'mocks.mocks.dart';
 
 export 'mocks.mocks.dart';
@@ -19,14 +20,18 @@ export 'mocks.mocks.dart';
 )
 class MockClient extends MockClientBase {
   MockClient() {
-    when(send(
-      any,
-    )).thenAnswer((realInvocation) => Future.value(MockStreamedResponse()));
+    when(
+      send(
+        any,
+      ),
+    ).thenAnswer((realInvocation) => Future.value(MockStreamedResponse()));
 
-    when(this.post(
-      any,
-      body: anyNamed('body'),
-    )).thenAnswer((realInvocation) => Future.value(MockResponse()));
+    when(
+      this.post(
+        any,
+        body: anyNamed('body'),
+      ),
+    ).thenAnswer((realInvocation) => Future.value(MockResponse()));
   }
 }
 

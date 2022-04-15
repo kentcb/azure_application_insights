@@ -33,7 +33,6 @@ void _eventTelemetry() {
             telemetry: EventTelemetryItem(
               name: 'SomeEvent',
               timestamp: DateTime(2020, 10, 26).toUtc(),
-              additionalProperties: const <String, Object>{},
             ),
             context: TelemetryContext(),
             expectedJson: '{"baseType":"EventData","baseData":{"ver":2,"name":"SomeEvent","properties":{}}}',
@@ -41,11 +40,12 @@ void _eventTelemetry() {
 
           _verifyDataMap(
             telemetry: EventTelemetryItem(
-                name: 'SomeEvent',
-                timestamp: DateTime(2020, 10, 26).toUtc(),
-                additionalProperties: const <String, Object>{
-                  'another': 1,
-                }),
+              name: 'SomeEvent',
+              timestamp: DateTime(2020, 10, 26).toUtc(),
+              additionalProperties: const <String, Object>{
+                'another': 1,
+              },
+            ),
             context: TelemetryContext()..properties['foo'] = 'bar',
             expectedJson:
                 '{"baseType":"EventData","baseData":{"ver":2,"name":"SomeEvent","properties":{"foo":"bar","another":1}}}',
@@ -70,9 +70,7 @@ void _exceptionTelemetry() {
             ),
             context: TelemetryContext(),
             expectedJson:
-                '{"baseType":"ExceptionData","baseData":{"ver":2,"severityLevel":3,"exceptions":[{"typeName":"String",'
-                '"message":"a non-critical error","hasFullStack":false}],"problemId":"ce2a6140b51626e15b01147dad0cf4ada5aa28d6",'
-                '"properties":{}}}',
+                '{"baseType":"ExceptionData","baseData":{"ver":2,"severityLevel":3,"exceptions":[{"typeName":"String","message":"a non-critical error","hasFullStack":false}],"problemId":"ce2a6140b51626e15b01147dad0cf4ada5aa28d6","properties":{}}}',
           );
 
           _verifyDataMap(
@@ -82,9 +80,7 @@ void _exceptionTelemetry() {
             ),
             context: TelemetryContext(),
             expectedJson:
-                '{"baseType":"ExceptionData","baseData":{"ver":2,"severityLevel":4,"exceptions":[{"typeName":"String",'
-                '"message":"a critical error","hasFullStack":false}],"problemId":"ee31030288c93ce2336389a45bd2b64be5d4514d",'
-                '"properties":{}}}',
+                '{"baseType":"ExceptionData","baseData":{"ver":2,"severityLevel":4,"exceptions":[{"typeName":"String","message":"a critical error","hasFullStack":false}],"problemId":"ee31030288c93ce2336389a45bd2b64be5d4514d","properties":{}}}',
           );
 
           _verifyDataMap(
@@ -95,9 +91,7 @@ void _exceptionTelemetry() {
             ),
             context: TelemetryContext(),
             expectedJson:
-                '{"baseType":"ExceptionData","baseData":{"ver":2,"severityLevel":4,"exceptions":[{"typeName":"String",'
-                '"message":"an error with an empty stack trace","hasFullStack":true}],'
-                '"problemId":"95762e69cc4165ab201b6cf22c9db54d8f6b8153","properties":{}}}',
+                '{"baseType":"ExceptionData","baseData":{"ver":2,"severityLevel":4,"exceptions":[{"typeName":"String","message":"an error with an empty stack trace","hasFullStack":true}],"problemId":"95762e69cc4165ab201b6cf22c9db54d8f6b8153","properties":{}}}',
           );
 
           _verifyDataMap(
@@ -108,10 +102,7 @@ void _exceptionTelemetry() {
             ),
             context: TelemetryContext(),
             expectedJson:
-                '{"baseType":"ExceptionData","baseData":{"ver":2,"severityLevel":4,"exceptions":[{"typeName":"String",'
-                '"message":"an error with stack trace","hasFullStack":true,"parsedStack":[{"level":0,"method":"_first",'
-                '"assembly":null,"fileName":".","line":null},{"level":1,"method":"_second","assembly":null,'
-                '"fileName":".","line":null}]}],"problemId":"021b549244a81c461387c9cef845b3daa368c581","properties":{}}}',
+                '{"baseType":"ExceptionData","baseData":{"ver":2,"severityLevel":4,"exceptions":[{"typeName":"String","message":"an error with stack trace","hasFullStack":true,"parsedStack":[{"level":0,"method":"_first","assembly":null,"fileName":".","line":null},{"level":1,"method":"_second","assembly":null,"fileName":".","line":null}]}],"problemId":"021b549244a81c461387c9cef845b3daa368c581","properties":{}}}',
           );
 
           _verifyDataMap(
@@ -124,9 +115,7 @@ void _exceptionTelemetry() {
             ),
             context: TelemetryContext()..properties['foo'] = 'bar',
             expectedJson:
-                '{"baseType":"ExceptionData","baseData":{"ver":2,"severityLevel":4,"exceptions":[{"typeName":"String",'
-                '"message":"an error with properties","hasFullStack":false}],'
-                '"problemId":"dc7b331564ab7acc456aee1c10e54adc8c710977","properties":{"foo":"bar","another":1}}}',
+                '{"baseType":"ExceptionData","baseData":{"ver":2,"severityLevel":4,"exceptions":[{"typeName":"String","message":"an error with properties","hasFullStack":false}],"problemId":"dc7b331564ab7acc456aee1c10e54adc8c710977","properties":{"foo":"bar","another":1}}}',
           );
         },
       );
@@ -312,8 +301,7 @@ void _traceTelemetry() {
             ),
             context: TelemetryContext(),
             expectedJson:
-                '{"baseType":"MessageData","baseData":{"ver":2,"severityLevel":1,"message":"a trace with different severity"'
-                ',"properties":{}}}',
+                '{"baseType":"MessageData","baseData":{"ver":2,"severityLevel":1,"message":"a trace with different severity","properties":{}}}',
           );
 
           _verifyDataMap(
@@ -326,8 +314,7 @@ void _traceTelemetry() {
             ),
             context: TelemetryContext()..properties['foo'] = 'bar',
             expectedJson:
-                '{"baseType":"MessageData","baseData":{"ver":2,"severityLevel":4,"message":"a trace with properties",'
-                '"properties":{"foo":"bar","another":1}}}',
+                '{"baseType":"MessageData","baseData":{"ver":2,"severityLevel":4,"message":"a trace with properties","properties":{"foo":"bar","another":1}}}',
           );
         },
       );

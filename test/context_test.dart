@@ -84,8 +84,8 @@ void _operationContext() {
           ..operation.name = 'name'
           ..operation.parentId = 'parent id'
           ..operation.syntheticSource = 'synthetic source',
-        expectedJson: '{"ai.operation.correlationVector":"correlation vector","ai.operation.id":"id",'
-            '"ai.operation.name":"name","ai.operation.parentId":"parent id","ai.operation.syntheticSource":"synthetic source"}',
+        expectedJson:
+            '{"ai.operation.correlationVector":"correlation vector","ai.operation.id":"id","ai.operation.name":"name","ai.operation.parentId":"parent id","ai.operation.syntheticSource":"synthetic source"}',
       );
     },
   );

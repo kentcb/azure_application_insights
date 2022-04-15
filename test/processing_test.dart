@@ -159,10 +159,12 @@ void _transmissionProcessor() {
           );
 
           expect(
-            verify(httpClient.post(
-              any,
-              body: captureAnyNamed('body'),
-            )).captured.single,
+            verify(
+              httpClient.post(
+                any,
+                body: captureAnyNamed('body'),
+              ),
+            ).captured.single,
             '[{"name":"AppEvents","time":"2020-10-26T00:00:00.000Z","iKey":"key","tags":{"ai.internal.sdkVersion":"1"},"data":{"baseType":"EventData","baseData":{"ver":2,"name":"anything","properties":{}}}}]',
           );
         },
