@@ -10,6 +10,7 @@ void main() {
   _operationContext();
   _sessionContext();
   _userContext();
+  _removingProperties();
 }
 
 void _verifyContextData({
@@ -117,4 +118,18 @@ void _userContext() {
       );
     },
   );
+}
+
+void _removingProperties() {
+  test('removing properties', () {
+    _verifyContextData(
+      context: TelemetryContext()
+        ..cloud.roleInstance = 'role instance'
+        ..cloud.role = 'role'
+        ..session.isFirst = true
+        ..cloud.role = null
+        ..session.isFirst = null,
+      expectedJson: '{"ai.cloud.roleInstance":"role instance"}',
+    );
+  });
 }
