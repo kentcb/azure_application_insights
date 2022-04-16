@@ -1,7 +1,7 @@
-import 'context.dart';
-import 'http.dart';
-import 'processing.dart';
-import 'telemetry.dart';
+import 'package:azure_application_insights/src/context.dart';
+import 'package:azure_application_insights/src/http.dart';
+import 'package:azure_application_insights/src/processing.dart';
+import 'package:azure_application_insights/src/telemetry.dart';
 
 /// Used to write telemetry data to Azure's Application Insights service.
 ///
@@ -59,14 +59,16 @@ class TelemetryClient {
     Map<String, Object> additionalProperties = const <String, Object>{},
     DateTime? timestamp,
   }) =>
-      _track(ExceptionTelemetryItem(
-        severity: severity,
-        error: error,
-        stackTrace: stackTrace,
-        problemId: problemId,
-        additionalProperties: additionalProperties,
-        timestamp: timestamp,
-      ));
+      _track(
+        ExceptionTelemetryItem(
+          severity: severity,
+          error: error,
+          stackTrace: stackTrace,
+          problemId: problemId,
+          additionalProperties: additionalProperties,
+          timestamp: timestamp,
+        ),
+      );
 
   /// Creates an [EventTelemetryItem] item and forwards it onto the [processor].
   void trackEvent({
@@ -74,11 +76,13 @@ class TelemetryClient {
     Map<String, Object> additionalProperties = const <String, Object>{},
     DateTime? timestamp,
   }) =>
-      _track(EventTelemetryItem(
-        name: name,
-        additionalProperties: additionalProperties,
-        timestamp: timestamp,
-      ));
+      _track(
+        EventTelemetryItem(
+          name: name,
+          additionalProperties: additionalProperties,
+          timestamp: timestamp,
+        ),
+      );
 
   /// Creates a [PageViewTelemetryItem] item and forwards it onto the [processor].
   void trackPageView({
@@ -89,14 +93,16 @@ class TelemetryClient {
     Map<String, Object> additionalProperties = const <String, Object>{},
     DateTime? timestamp,
   }) =>
-      _track(PageViewTelemetryItem(
-        duration: duration,
-        id: id,
-        name: name,
-        additionalProperties: additionalProperties,
-        url: url,
-        timestamp: timestamp,
-      ));
+      _track(
+        PageViewTelemetryItem(
+          duration: duration,
+          id: id,
+          name: name,
+          additionalProperties: additionalProperties,
+          url: url,
+          timestamp: timestamp,
+        ),
+      );
 
   /// Creates a [RequestTelemetryItem] item and forwards it onto the [processor].
   void trackRequest({
@@ -110,17 +116,19 @@ class TelemetryClient {
     Map<String, Object> additionalProperties = const <String, Object>{},
     DateTime? timestamp,
   }) =>
-      _track(RequestTelemetryItem(
-        duration: duration,
-        id: id,
-        name: name,
-        additionalProperties: additionalProperties,
-        responseCode: responseCode,
-        source: source,
-        success: success,
-        url: url,
-        timestamp: timestamp,
-      ));
+      _track(
+        RequestTelemetryItem(
+          duration: duration,
+          id: id,
+          name: name,
+          additionalProperties: additionalProperties,
+          responseCode: responseCode,
+          source: source,
+          success: success,
+          url: url,
+          timestamp: timestamp,
+        ),
+      );
 
   /// Creates a [TraceTelemetryItem] item and forwards it onto the [processor].
   void trackTrace({
@@ -129,12 +137,14 @@ class TelemetryClient {
     Map<String, Object> additionalProperties = const <String, Object>{},
     DateTime? timestamp,
   }) =>
-      _track(TraceTelemetryItem(
-        severity: severity,
-        message: message,
-        additionalProperties: additionalProperties,
-        timestamp: timestamp,
-      ));
+      _track(
+        TraceTelemetryItem(
+          severity: severity,
+          message: message,
+          additionalProperties: additionalProperties,
+          timestamp: timestamp,
+        ),
+      );
 
   void _track(TelemetryItem telemetry) {
     // We clone the context at this point so that any mutations prior to processing do not affect the outcome.

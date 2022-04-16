@@ -31,7 +31,8 @@ void _cloudContext() {
         context: TelemetryContext()
           ..cloud.role = 'role'
           ..cloud.roleInstance = 'role instance',
-        expectedJson: '{"ai.cloud.role":"role","ai.cloud.roleInstance":"role instance"}',
+        expectedJson:
+            '{"ai.cloud.role":"role","ai.cloud.roleInstance":"role instance"}',
       );
     },
   );
@@ -49,7 +50,8 @@ void _deviceContext() {
           ..device.oemName = 'oem name'
           ..device.osVersion = 'os version'
           ..device.type = 'type',
-        expectedJson: '{"ai.device.id":"id","ai.device.locale":"locale","ai.device.model":"model","ai.device.oemName":'
+        expectedJson:
+            '{"ai.device.id":"id","ai.device.locale":"locale","ai.device.model":"model","ai.device.oemName":'
             '"oem name","ai.device.osVersion":"os version","ai.device.type":"type"}',
       );
     },
@@ -66,7 +68,8 @@ void _locationContext() {
           ..location.country = 'country'
           ..location.ip = 'ip'
           ..location.province = 'province',
-        expectedJson: '{"ai.location.city":"city","ai.location.country":"country","ai.location.ip":"ip",'
+        expectedJson:
+            '{"ai.location.city":"city","ai.location.country":"country","ai.location.ip":"ip",'
             '"ai.location.province":"province"}',
       );
     },
@@ -84,8 +87,8 @@ void _operationContext() {
           ..operation.name = 'name'
           ..operation.parentId = 'parent id'
           ..operation.syntheticSource = 'synthetic source',
-        expectedJson: '{"ai.operation.correlationVector":"correlation vector","ai.operation.id":"id",'
-            '"ai.operation.name":"name","ai.operation.parentId":"parent id","ai.operation.syntheticSource":"synthetic source"}',
+        expectedJson:
+            '{"ai.operation.correlationVector":"correlation vector","ai.operation.id":"id","ai.operation.name":"name","ai.operation.parentId":"parent id","ai.operation.syntheticSource":"synthetic source"}',
       );
     },
   );
@@ -114,7 +117,8 @@ void _userContext() {
           ..user.accountId = 'account id'
           ..user.authUserId = 'auth user id'
           ..user.id = 'id',
-        expectedJson: '{"ai.user.accountId":"account id","ai.user.authUserId":"auth user id","ai.user.id":"id"}',
+        expectedJson:
+            '{"ai.user.accountId":"account id","ai.user.authUserId":"auth user id","ai.user.id":"id"}',
       );
     },
   );

@@ -22,9 +22,11 @@ void _telemetryHttpClient() {
           final response = MockStreamedResponse();
 
           final inner = MockClient();
-          when(inner.send(
-            any,
-          )).thenAnswer((realInvocation) => Future.value(response));
+          when(
+            inner.send(
+              any,
+            ),
+          ).thenAnswer((realInvocation) => Future.value(response));
 
           final sut = TelemetryHttpClient(
             inner: inner,
@@ -114,9 +116,11 @@ void _telemetryHttpClient() {
             final streamedResponse = MockStreamedResponse();
             when(streamedResponse.statusCode).thenReturn(statusCode);
             final inner = MockClient();
-            when(inner.send(
-              any,
-            )).thenAnswer((realInvocation) => Future.value(streamedResponse));
+            when(
+              inner.send(
+                any,
+              ),
+            ).thenAnswer((realInvocation) => Future.value(streamedResponse));
 
             final telemetryClient = MockTelemetryClient();
             final sut = TelemetryHttpClient(
@@ -178,7 +182,7 @@ void _telemetryHttpClient() {
             body: 'a body',
           );
 
-          final Map<String, Object> properties = verify(
+          final properties = verify(
             telemetryClient.trackRequest(
               id: anyNamed('id'),
               url: anyNamed('url'),
@@ -188,12 +192,13 @@ void _telemetryHttpClient() {
               additionalProperties: captureAnyNamed('additionalProperties'),
               timestamp: anyNamed('timestamp'),
             ),
-          ).captured.single;
+          ).captured.single as Map<String, Object>;
 
           expect(properties.length, 3);
           expect(properties['method'], 'POST');
           expect(properties['contentLength'], 6);
-          expect(properties['headers'], 'first=value1,second=value2,content-type=text/plain; charset=utf-8');
+          expect(properties['headers'],
+              'first=value1,second=value2,content-type=text/plain; charset=utf-8');
         },
       );
 
@@ -215,7 +220,7 @@ void _telemetryHttpClient() {
             body: 'a body',
           );
 
-          final DateTime timestamp = verify(
+          final timestamp = verify(
             telemetryClient.trackRequest(
               id: anyNamed('id'),
               url: anyNamed('url'),
@@ -225,7 +230,7 @@ void _telemetryHttpClient() {
               additionalProperties: anyNamed('additionalProperties'),
               timestamp: captureAnyNamed('timestamp'),
             ),
-          ).captured.single;
+          ).captured.single as DateTime;
 
           expect(timestamp, isNotNull);
         },

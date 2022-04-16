@@ -1,10 +1,10 @@
 import 'dart:convert';
 
+import 'package:azure_application_insights/src/context.dart';
+import 'package:azure_application_insights/src/serialization.dart';
 import 'package:crypto/crypto.dart';
 import 'package:meta/meta.dart';
 import 'package:stack_trace/stack_trace.dart';
-import 'context.dart';
-import 'serialization.dart';
 
 /// A base class for all types of telemetry items.
 @immutable
@@ -103,7 +103,8 @@ class ExceptionTelemetryItem implements TelemetryItem {
   Map<String, dynamic> serialize({
     required TelemetryContext context,
   }) {
-    final trace = stackTrace == null ? null : Trace.parse(stackTrace.toString());
+    final trace =
+        stackTrace == null ? null : Trace.parse(stackTrace.toString());
     return <String, dynamic>{
       'baseType': 'ExceptionData',
       'baseData': <String, dynamic>{
@@ -123,7 +124,8 @@ class ExceptionTelemetryItem implements TelemetryItem {
 
   String _generateProblemId(Trace? trace) {
     // Make a best effort at disambiguating errors by using the error message and the first frame from any available stack trace.
-    final code = '$error${trace == null || trace.frames.isEmpty ? '' : trace.frames[0].toString()}';
+    final code =
+        '$error${trace == null || trace.frames.isEmpty ? '' : trace.frames[0].toString()}';
     final codeBytes = utf8.encode(code);
     final hash = sha1.convert(codeBytes);
     final result = hash.toString();
@@ -138,13 +140,15 @@ class ExceptionTelemetryItem implements TelemetryItem {
           'parsedStack': trace.frames
               .asMap()
               .entries
-              .map((e) => <String, dynamic>{
-                    'level': e.key,
-                    'method': e.value.member,
-                    'assembly': e.value.package,
-                    'fileName': e.value.location,
-                    'line': e.value.line,
-                  })
+              .map(
+                (e) => <String, dynamic>{
+                  'level': e.key,
+                  'method': e.value.member,
+                  'assembly': e.value.package,
+                  'fileName': e.value.location,
+                  'line': e.value.line,
+                },
+              )
               .toList(growable: false),
       };
 }

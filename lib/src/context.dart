@@ -1,4 +1,4 @@
-import 'client.dart';
+import 'package:azure_application_insights/src/client.dart';
 
 /// Additional information to be attached to telemetry items produced by a [TelemetryClient].
 ///
@@ -29,12 +29,14 @@ class TelemetryContext {
   static const _applicationVersionKey = 'ai.application.ver';
 
   /// The application version to attach to telemetry items.
-  String? get applicationVersion => _contextMap[_applicationVersionKey];
+  String? get applicationVersion =>
+      _contextMap[_applicationVersionKey] as String?;
 
   /// Setting will change the application version attached to telemetry items submitted with this context.
   ///
   /// This is a convenience for setting the `ai.application.ver` key on [TelemetryContext.properties].
-  set applicationVersion(String? value) => _contextMap.setOrRemove(_applicationVersionKey, value);
+  set applicationVersion(String? value) =>
+      _contextMap.setOrRemove(_applicationVersionKey, value);
 
   /// Cloud-related properties to attach to telemetry items.
   final CloudContext cloud;
@@ -59,7 +61,8 @@ class TelemetryContext {
   Map<String, dynamic> get properties => _contextMap;
 
   /// Creates a clone of this context that is completely independent of its source.
-  TelemetryContext clone() => TelemetryContext._(Map<String, dynamic>.from(_contextMap));
+  TelemetryContext clone() =>
+      TelemetryContext._(Map<String, dynamic>.from(_contextMap));
 }
 
 /// Encapsulates cloud-related properties in a related [TelemetryContext].
@@ -72,7 +75,7 @@ class CloudContext {
   static const _roleInstanceKey = '${_prefix}roleInstance';
 
   /// The cloud role to attach to telemetry items.
-  String? get role => _contextMap[_roleKey];
+  String? get role => _contextMap[_roleKey] as String?;
 
   /// Setting will change the cloud role attached to telemetry items submitted with this context.
   ///
@@ -80,15 +83,17 @@ class CloudContext {
   set role(String? value) => _contextMap.setOrRemove(_roleKey, value);
 
   /// The cloud role instance to attach to telemetry items.
-  String? get roleInstance => _contextMap[_roleInstanceKey];
+  String? get roleInstance => _contextMap[_roleInstanceKey] as String?;
 
   /// Setting will change the cloud role instance attached to telemetry items submitted with this context.
   ///
   /// This is a convenience for setting the `ai.cloud.roleInstance` key on [TelemetryContext.properties].
-  set roleInstance(String? value) => _contextMap.setOrRemove(_roleInstanceKey, value);
+  set roleInstance(String? value) =>
+      _contextMap.setOrRemove(_roleInstanceKey, value);
 
   /// Remove cloud properties from the associated [TelemetryContext.properties].
-  void clear() => _contextMap.removeWhere((key, dynamic value) => key.startsWith(_prefix));
+  void clear() =>
+      _contextMap.removeWhere((key, dynamic value) => key.startsWith(_prefix));
 }
 
 /// Encapsulates device-related properties in a related [TelemetryContext].
@@ -105,7 +110,7 @@ class DeviceContext {
   static const _typeKey = '${_prefix}type';
 
   /// The device ID to attach to telemetry items.
-  String? get id => _contextMap[_idKey];
+  String? get id => _contextMap[_idKey] as String?;
 
   /// Setting will change the device ID attached to telemetry items submitted with this context.
   ///
@@ -113,7 +118,7 @@ class DeviceContext {
   set id(String? value) => _contextMap.setOrRemove(_idKey, value);
 
   /// The device locale to attach to telemetry items.
-  String? get locale => _contextMap[_localeKey];
+  String? get locale => _contextMap[_localeKey] as String?;
 
   /// Setting will change the device locale attached to telemetry items submitted with this context.
   ///
@@ -121,7 +126,7 @@ class DeviceContext {
   set locale(String? value) => _contextMap.setOrRemove(_localeKey, value);
 
   /// The device model to attach to telemetry items.
-  String? get model => _contextMap[_modelKey];
+  String? get model => _contextMap[_modelKey] as String?;
 
   /// Setting will change the devicemodel attached to telemetry items submitted with this context.
   ///
@@ -129,7 +134,7 @@ class DeviceContext {
   set model(String? value) => _contextMap.setOrRemove(_modelKey, value);
 
   /// The device OEM name to attach to telemetry items.
-  String? get oemName => _contextMap[_oemNameKey];
+  String? get oemName => _contextMap[_oemNameKey] as String?;
 
   /// Setting will change the device OEM name attached to telemetry items submitted with this context.
   ///
@@ -137,7 +142,7 @@ class DeviceContext {
   set oemName(String? value) => _contextMap.setOrRemove(_oemNameKey, value);
 
   /// The device operating system version to attach to telemetry items.
-  String? get osVersion => _contextMap[_osVersionKey];
+  String? get osVersion => _contextMap[_osVersionKey] as String?;
 
   /// Setting will change the device operating system version attached to telemetry items submitted with
   /// this context.
@@ -146,7 +151,7 @@ class DeviceContext {
   set osVersion(String? value) => _contextMap.setOrRemove(_osVersionKey, value);
 
   /// The device type to attach to telemetry items.
-  String? get type => _contextMap[_typeKey];
+  String? get type => _contextMap[_typeKey] as String?;
 
   /// Setting will change the device type attached to telemetry items submitted with this context.
   ///
@@ -154,7 +159,8 @@ class DeviceContext {
   set type(String? value) => _contextMap.setOrRemove(_typeKey, value);
 
   /// Remove device properties from the associated [TelemetryContext.properties].
-  void clear() => _contextMap.removeWhere((key, dynamic value) => key.startsWith(_prefix));
+  void clear() =>
+      _contextMap.removeWhere((key, dynamic value) => key.startsWith(_prefix));
 }
 
 /// Encapsulates location-related properties in a related [TelemetryContext].
@@ -169,7 +175,7 @@ class LocationContext {
   static const _cityKey = '${_prefix}city';
 
   /// The location IP address to attach to telemetry items.
-  String? get ip => _contextMap[_ipKey];
+  String? get ip => _contextMap[_ipKey] as String?;
 
   /// Setting will change the location IP address attached to telemetry items submitted with this context.
   ///
@@ -177,7 +183,7 @@ class LocationContext {
   set ip(String? value) => _contextMap.setOrRemove(_ipKey, value);
 
   /// The location country to attach to telemetry items.
-  String? get country => _contextMap[_countryKey];
+  String? get country => _contextMap[_countryKey] as String?;
 
   /// Setting will change the location country attached to telemetry items submitted with this context.
   ///
@@ -185,7 +191,7 @@ class LocationContext {
   set country(String? value) => _contextMap.setOrRemove(_countryKey, value);
 
   /// The location province to attach to telemetry items.
-  String? get province => _contextMap[_provinceKey];
+  String? get province => _contextMap[_provinceKey] as String?;
 
   /// Setting will change the location province attached to telemetry items submitted with this context.
   ///
@@ -193,7 +199,7 @@ class LocationContext {
   set province(String? value) => _contextMap.setOrRemove(_provinceKey, value);
 
   /// The location city to attach to telemetry items.
-  String? get city => _contextMap[_cityKey];
+  String? get city => _contextMap[_cityKey] as String?;
 
   /// Setting will change the location city attached to telemetry items submitted with this context.
   ///
@@ -201,7 +207,8 @@ class LocationContext {
   set city(String? value) => _contextMap.setOrRemove(_cityKey, value);
 
   /// Remove location properties from the associated [TelemetryContext.properties].
-  void clear() => _contextMap.removeWhere((key, dynamic value) => key.startsWith(_prefix));
+  void clear() =>
+      _contextMap.removeWhere((key, dynamic value) => key.startsWith(_prefix));
 }
 
 /// Encapsulates operation-related properties in a related [TelemetryContext].
@@ -217,7 +224,7 @@ class OperationContext {
   static const _correlationVectorKey = '${_prefix}correlationVector';
 
   /// The operation ID to attach to telemetry items.
-  String? get id => _contextMap[_idKey];
+  String? get id => _contextMap[_idKey] as String?;
 
   /// Setting will change the operation ID attached to telemetry items submitted with this context.
   ///
@@ -225,7 +232,7 @@ class OperationContext {
   set id(String? value) => _contextMap.setOrRemove(_idKey, value);
 
   /// The operation name to attach to telemetry items.
-  String? get name => _contextMap[_nameKey];
+  String? get name => _contextMap[_nameKey] as String?;
 
   /// Setting will change the operation name attached to telemetry items submitted with this context.
   ///
@@ -233,7 +240,7 @@ class OperationContext {
   set name(String? value) => _contextMap.setOrRemove(_nameKey, value);
 
   /// The operation parent ID to attach to telemetry items.
-  String? get parentId => _contextMap[_parentIdKey];
+  String? get parentId => _contextMap[_parentIdKey] as String?;
 
   /// Setting will change the operation parent ID attached to telemetry items submitted with this context.
   ///
@@ -241,23 +248,27 @@ class OperationContext {
   set parentId(String? value) => _contextMap.setOrRemove(_parentIdKey, value);
 
   /// The operation synthetic source to attach to telemetry items.
-  String? get syntheticSource => _contextMap[_syntheticSourceKey];
+  String? get syntheticSource => _contextMap[_syntheticSourceKey] as String?;
 
   /// Setting will change the operation synthetic source attached to telemetry items submitted with this context.
   ///
   /// This is a convenience for setting the `ai.operation.syntheticSource` key on [TelemetryContext.properties].
-  set syntheticSource(String? value) => _contextMap.setOrRemove(_syntheticSourceKey, value);
+  set syntheticSource(String? value) =>
+      _contextMap.setOrRemove(_syntheticSourceKey, value);
 
   /// The operation correlation vector to attach to telemetry items.
-  String? get correlationVector => _contextMap[_correlationVectorKey];
+  String? get correlationVector =>
+      _contextMap[_correlationVectorKey] as String?;
 
   /// Setting will change the operation correlation vector attached to telemetry items submitted with this context.
   ///
   /// This is a convenience for setting the `ai.operation.correlationVector` key on [TelemetryContext.properties].
-  set correlationVector(String? value) => _contextMap.setOrRemove(_correlationVectorKey, value);
+  set correlationVector(String? value) =>
+      _contextMap.setOrRemove(_correlationVectorKey, value);
 
   /// Remove operation properties from the associated [TelemetryContext.properties].
-  void clear() => _contextMap.removeWhere((key, dynamic value) => key.startsWith(_prefix));
+  void clear() =>
+      _contextMap.removeWhere((key, dynamic value) => key.startsWith(_prefix));
 }
 
 /// Encapsulates session-related properties in a related [TelemetryContext].
@@ -270,7 +281,7 @@ class SessionContext {
   static const _isFirstKey = '${_prefix}isFirst';
 
   /// The session ID to attach to telemetry items.
-  String? get sessionId => _contextMap[_idKey];
+  String? get sessionId => _contextMap[_idKey] as String?;
 
   /// Setting will change the session ID attached to telemetry items submitted with this context.
   ///
@@ -278,7 +289,7 @@ class SessionContext {
   set sessionId(String? value) => _contextMap.setOrRemove(_idKey, value);
 
   /// The session "is first" flag to attach to telemetry items.
-  bool? get isFirst => _contextMap[_isFirstKey];
+  bool? get isFirst => _contextMap[_isFirstKey] as bool?;
 
   /// Setting will change the session "is first" flag attached to telemetry items submitted with this context.
   ///
@@ -286,7 +297,8 @@ class SessionContext {
   set isFirst(bool? value) => _contextMap.setOrRemove(_isFirstKey, value);
 
   /// Remove session properties from the associated [TelemetryContext.properties].
-  void clear() => _contextMap.removeWhere((key, dynamic value) => key.startsWith(_prefix));
+  void clear() =>
+      _contextMap.removeWhere((key, dynamic value) => key.startsWith(_prefix));
 }
 
 /// Encapsulates user-related properties in a related [TelemetryContext].
@@ -300,7 +312,7 @@ class UserContext {
   static const _authUserIdKey = '${_prefix}authUserId';
 
   /// The user account ID to attach to telemetry items.
-  String? get accountId => _contextMap[_accountIdKey];
+  String? get accountId => _contextMap[_accountIdKey] as String?;
 
   /// Setting will change the user account ID attached to telemetry items submitted with this context.
   ///
@@ -308,7 +320,7 @@ class UserContext {
   set accountId(String? value) => _contextMap.setOrRemove(_accountIdKey, value);
 
   /// The user ID to attach to telemetry items.
-  String? get id => _contextMap[_userIdKey];
+  String? get id => _contextMap[_userIdKey] as String?;
 
   /// Setting will change the user ID attached to telemetry items submitted with this context.
   ///
@@ -316,17 +328,20 @@ class UserContext {
   set id(String? value) => _contextMap.setOrRemove(_userIdKey, value);
 
   /// The user authenticated ID to attach to telemetry items.
-  String? get authUserId => _contextMap[_authUserIdKey];
+  String? get authUserId => _contextMap[_authUserIdKey] as String?;
 
   /// Setting will change the user authenticated ID attached to telemetry items submitted with this context.
   ///
   /// This is a convenience for setting the `ai.user.authUserId` key on [TelemetryContext.properties].
-  set authUserId(String? value) => _contextMap.setOrRemove(_authUserIdKey, value);
+  set authUserId(String? value) =>
+      _contextMap.setOrRemove(_authUserIdKey, value);
 
   /// Remove user properties from the associated [TelemetryContext.properties].
-  void clear() => _contextMap.removeWhere((key, dynamic value) => key.startsWith(_prefix));
+  void clear() =>
+      _contextMap.removeWhere((key, dynamic value) => key.startsWith(_prefix));
 }
 
 extension _MapExtensions<K, V> on Map<K, V> {
-  void setOrRemove(K key, V value) => value == null ? remove(key) : this[key] = value;
+  void setOrRemove(K key, V value) =>
+      value == null ? remove(key) : this[key] = value;
 }

@@ -1,8 +1,7 @@
 import 'dart:math';
 
+import 'package:azure_application_insights/src/client.dart';
 import 'package:http/http.dart';
-
-import 'client.dart';
 
 /// A [Client] that automatically forwards the details of all completed HTTP requests onto [telemetryClient] via
 /// the [TelemetryClient.trackRequest] method.
@@ -39,7 +38,8 @@ class TelemetryHttpClient extends BaseClient {
       success: response.statusCode >= 200 && response.statusCode < 300,
       additionalProperties: <String, Object>{
         'method': request.method,
-        'headers': request.headers.entries.map((e) => '${e.key}=${e.value}').join(','),
+        'headers':
+            request.headers.entries.map((e) => '${e.key}=${e.value}').join(','),
         if (contentLength != null) 'contentLength': contentLength,
       },
       timestamp: timestamp,

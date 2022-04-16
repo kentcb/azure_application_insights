@@ -9,7 +9,8 @@ const instrumentationKey = 'TODO';
 Future<void> main() async {
   if (instrumentationKey == 'TODO') {
     print(
-        'Before running this example, you must provide your Application Insights instrumentation key by copying it into the code.');
+      'Before running this example, you must provide your Application Insights instrumentation key by copying it into the code.',
+    );
     return;
   }
 

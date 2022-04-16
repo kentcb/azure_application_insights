@@ -1,3 +1,8 @@
+## 3.0.0
+
+- Fix `TelemetryContext` so that the various getters and setters are nullable (thanks @mernen)
+- Relevant `Processor` implementations now write to a `Logger` rather than directly to standard out
+
 ## 2.1.1
 
 - Fix `TelemetryContext`'s `user.id` property to set the correct key (`ai.user.id` instead of `ai.user.userId`)

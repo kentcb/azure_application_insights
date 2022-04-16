@@ -34,7 +34,10 @@ void _bufferedProcessor() {
             ],
           );
 
-          verify(next.process(contextualTelemetryItems: anyNamed('contextualTelemetryItems'))).called(1);
+          verify(next.process(
+                  contextualTelemetryItems:
+                      anyNamed('contextualTelemetryItems')))
+              .called(1);
         },
       );
 
@@ -60,7 +63,10 @@ void _bufferedProcessor() {
             ],
           );
 
-          verify(next.process(contextualTelemetryItems: anyNamed('contextualTelemetryItems'))).called(1);
+          verify(next.process(
+                  contextualTelemetryItems:
+                      anyNamed('contextualTelemetryItems')))
+              .called(1);
         },
       );
 
@@ -84,11 +90,18 @@ void _bufferedProcessor() {
                 ],
               );
 
-              verifyNever(next.process(contextualTelemetryItems: anyNamed('contextualTelemetryItems')));
+              verifyNever(next.process(
+                  contextualTelemetryItems:
+                      anyNamed('contextualTelemetryItems')));
               async.elapse(const Duration(seconds: 5));
-              verifyNever(next.process(contextualTelemetryItems: anyNamed('contextualTelemetryItems')));
+              verifyNever(next.process(
+                  contextualTelemetryItems:
+                      anyNamed('contextualTelemetryItems')));
               async.elapse(const Duration(seconds: 6));
-              verify(next.process(contextualTelemetryItems: anyNamed('contextualTelemetryItems'))).called(1);
+              verify(next.process(
+                      contextualTelemetryItems:
+                          anyNamed('contextualTelemetryItems')))
+                  .called(1);
             },
           );
         },
@@ -103,7 +116,8 @@ void _bufferedProcessor() {
           );
           sut.flush();
 
-          verifyNever(next.process(contextualTelemetryItems: anyNamed('contextualTelemetryItems')));
+          verifyNever(next.process(
+              contextualTelemetryItems: anyNamed('contextualTelemetryItems')));
         },
       );
 
@@ -124,9 +138,13 @@ void _bufferedProcessor() {
             ],
           );
 
-          verifyNever(next.process(contextualTelemetryItems: anyNamed('contextualTelemetryItems')));
+          verifyNever(next.process(
+              contextualTelemetryItems: anyNamed('contextualTelemetryItems')));
           sut.flush();
-          verify(next.process(contextualTelemetryItems: anyNamed('contextualTelemetryItems'))).called(1);
+          verify(next.process(
+                  contextualTelemetryItems:
+                      anyNamed('contextualTelemetryItems')))
+              .called(1);
         },
       );
     },
@@ -159,10 +177,12 @@ void _transmissionProcessor() {
           );
 
           expect(
-            verify(httpClient.post(
-              any,
-              body: captureAnyNamed('body'),
-            )).captured.single,
+            verify(
+              httpClient.post(
+                any,
+                body: captureAnyNamed('body'),
+              ),
+            ).captured.single,
             '[{"name":"AppEvents","time":"2020-10-26T00:00:00.000Z","iKey":"key","tags":{"ai.internal.sdkVersion":"1"},"data":{"baseType":"EventData","baseData":{"ver":2,"name":"anything","properties":{}}}}]',
           );
         },
@@ -191,7 +211,10 @@ void _transmissionProcessor() {
             ],
           );
 
-          verify(next.process(contextualTelemetryItems: anyNamed('contextualTelemetryItems'))).called(1);
+          verify(next.process(
+                  contextualTelemetryItems:
+                      anyNamed('contextualTelemetryItems')))
+              .called(1);
         },
       );
     },
