@@ -15,6 +15,7 @@ class TelemetryHttpClient extends BaseClient {
   TelemetryHttpClient({
     required this.inner,
     required this.telemetryClient,
+    this.appendHeaders = true,
   });
 
   /// The inner HTTP client.
@@ -22,6 +23,10 @@ class TelemetryHttpClient extends BaseClient {
 
   /// The telemetry client.
   final TelemetryClient telemetryClient;
+
+  /// Option to not append headers by setting this property to false. Could e.g. be of interest when it is not
+  /// desirable to track authentication bearer token.
+  final bool appendHeaders;
 
   @override
   Future<StreamedResponse> send(BaseRequest request) async {
@@ -38,8 +43,7 @@ class TelemetryHttpClient extends BaseClient {
       success: response.statusCode >= 200 && response.statusCode < 300,
       additionalProperties: <String, Object>{
         'method': request.method,
-        'headers':
-            request.headers.entries.map((e) => '${e.key}=${e.value}').join(','),
+        if (appendHeaders) 'headers': request.headers.entries.map((e) => '${e.key}=${e.value}').join(','),
         if (contentLength != null) 'contentLength': contentLength,
       },
       timestamp: timestamp,

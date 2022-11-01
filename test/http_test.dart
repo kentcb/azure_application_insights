@@ -197,8 +197,7 @@ void _telemetryHttpClient() {
           expect(properties.length, 3);
           expect(properties['method'], 'POST');
           expect(properties['contentLength'], 6);
-          expect(properties['headers'],
-              'first=value1,second=value2,content-type=text/plain; charset=utf-8');
+          expect(properties['headers'], 'first=value1,second=value2,content-type=text/plain; charset=utf-8');
         },
       );
 
@@ -233,6 +232,44 @@ void _telemetryHttpClient() {
           ).captured.single as DateTime;
 
           expect(timestamp, isNotNull);
+        },
+      );
+
+      test(
+        'can configure request header to not be appended',
+        () async {
+          final inner = MockClient();
+          final telemetryClient = MockTelemetryClient();
+          final sut = TelemetryHttpClient(
+            inner: inner,
+            telemetryClient: telemetryClient,
+            appendHeaders: false,
+          );
+          await sut.post(
+            Uri.parse('http://www.whatever.com'),
+            headers: <String, String>{
+              'first': 'value1',
+              'second': 'value2',
+            },
+            body: 'a body',
+          );
+
+          final properties = verify(
+            telemetryClient.trackRequest(
+              id: anyNamed('id'),
+              url: anyNamed('url'),
+              duration: anyNamed('duration'),
+              responseCode: anyNamed('responseCode'),
+              success: anyNamed('success'),
+              additionalProperties: captureAnyNamed('additionalProperties'),
+              timestamp: anyNamed('timestamp'),
+            ),
+          ).captured.single as Map<String, Object>;
+
+          expect(properties.length, 2);
+          expect(properties['headers'], isNull);
+          expect(properties['method'], 'POST');
+          expect(properties['contentLength'], 6);
         },
       );
     },
