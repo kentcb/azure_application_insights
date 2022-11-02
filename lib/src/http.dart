@@ -15,7 +15,7 @@ class TelemetryHttpClient extends BaseClient {
   TelemetryHttpClient({
     required this.inner,
     required this.telemetryClient,
-    this.appendHeaders = true,
+    this.forwardHeader,
   });
 
   /// The inner HTTP client.
@@ -24,9 +24,26 @@ class TelemetryHttpClient extends BaseClient {
   /// The telemetry client.
   final TelemetryClient telemetryClient;
 
-  /// Option to not append headers by setting this property to false. Could e.g. be of interest when it is not
-  /// desirable to track authentication bearer token.
-  final bool appendHeaders;
+  /// Callback that determines whether or not to append certain header.
+  ///
+  /// [forwardHeader] defaults to null, meaning all headers will be appended. Other examples:
+  ///
+  /// If only header named 'foo' should be appended when tracking request:
+  /// ``` dart
+  /// TelemetryHttpClient(
+  ///   ...
+  ///   forwardHeader: (header) => header == 'foo',
+  /// )
+  /// ```
+  ///
+  /// If no headers should be appended when tracking request:
+  /// ``` dart
+  /// TelemetryHttpClient(
+  ///   ...
+  ///   forwardHeader: (_) => false,
+  /// )
+  /// ```
+  final bool Function(String header)? forwardHeader;
 
   @override
   Future<StreamedResponse> send(BaseRequest request) async {
@@ -35,6 +52,7 @@ class TelemetryHttpClient extends BaseClient {
     final response = await inner.send(request);
     final contentLength = request.contentLength;
     stopwatch.stop();
+    final headers = _filteredHeaders(forwardHeader, request.headers);
     telemetryClient.trackRequest(
       id: _generateRequestId(),
       url: request.url.toString(),
@@ -43,7 +61,7 @@ class TelemetryHttpClient extends BaseClient {
       success: response.statusCode >= 200 && response.statusCode < 300,
       additionalProperties: <String, Object>{
         'method': request.method,
-        if (appendHeaders) 'headers': request.headers.entries.map((e) => '${e.key}=${e.value}').join(','),
+        if (headers.isNotEmpty) 'headers': headers,
         if (contentLength != null) 'contentLength': contentLength,
       },
       timestamp: timestamp,
@@ -66,4 +84,14 @@ String _generateRequestId() {
   }
 
   return result.toString();
+}
+
+String _filteredHeaders(bool Function(String header)? forwardHeader, Map<String, String> headers) {
+  final buffer = <String>[];
+  headers.forEach((header, value) {
+    if (forwardHeader?.call(header) ?? true) {
+      buffer.add('$header=$value');
+    }
+  });
+  return buffer.join(',');
 }

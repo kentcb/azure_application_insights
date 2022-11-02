@@ -236,14 +236,14 @@ void _telemetryHttpClient() {
       );
 
       test(
-        'can configure request header to not be appended',
+        'can configure that no request headers are appended',
         () async {
           final inner = MockClient();
           final telemetryClient = MockTelemetryClient();
           final sut = TelemetryHttpClient(
             inner: inner,
             telemetryClient: telemetryClient,
-            appendHeaders: false,
+            forwardHeader: (_) => false,
           );
           await sut.post(
             Uri.parse('http://www.whatever.com'),
@@ -268,6 +268,45 @@ void _telemetryHttpClient() {
 
           expect(properties.length, 2);
           expect(properties['headers'], isNull);
+          expect(properties['method'], 'POST');
+          expect(properties['contentLength'], 6);
+        },
+      );
+
+      test(
+        'can configure that selection of request headers are appended',
+        () async {
+          final inner = MockClient();
+          final telemetryClient = MockTelemetryClient();
+          final sut = TelemetryHttpClient(
+            inner: inner,
+            telemetryClient: telemetryClient,
+            forwardHeader: (header) => header == 'first' || header == 'third',
+          );
+          await sut.post(
+            Uri.parse('http://www.whatever.com'),
+            headers: <String, String>{
+              'first': 'value1',
+              'second': 'value2',
+              'third': 'value3',
+            },
+            body: 'a body',
+          );
+
+          final properties = verify(
+            telemetryClient.trackRequest(
+              id: anyNamed('id'),
+              url: anyNamed('url'),
+              duration: anyNamed('duration'),
+              responseCode: anyNamed('responseCode'),
+              success: anyNamed('success'),
+              additionalProperties: captureAnyNamed('additionalProperties'),
+              timestamp: anyNamed('timestamp'),
+            ),
+          ).captured.single as Map<String, Object>;
+
+          expect(properties.length, 3);
+          expect(properties['headers'], 'first=value1,third=value3');
           expect(properties['method'], 'POST');
           expect(properties['contentLength'], 6);
         },
