@@ -15,7 +15,7 @@ class TelemetryHttpClient extends BaseClient {
   TelemetryHttpClient({
     required this.inner,
     required this.telemetryClient,
-    this.forwardHeader,
+    this.appendHeader,
   });
 
   /// The inner HTTP client.
@@ -26,13 +26,13 @@ class TelemetryHttpClient extends BaseClient {
 
   /// Callback that determines whether or not to append certain header.
   ///
-  /// [forwardHeader] defaults to null, meaning all headers will be appended. Other examples:
+  /// [appendHeader] defaults to null, meaning all headers will be appended. Other examples:
   ///
   /// If only header named 'foo' should be appended when tracking request:
   /// ``` dart
   /// TelemetryHttpClient(
   ///   ...
-  ///   forwardHeader: (header) => header == 'foo',
+  ///   appendHeader: (header) => header == 'foo',
   /// )
   /// ```
   ///
@@ -40,10 +40,10 @@ class TelemetryHttpClient extends BaseClient {
   /// ``` dart
   /// TelemetryHttpClient(
   ///   ...
-  ///   forwardHeader: (_) => false,
+  ///   appendHeader: (_) => false,
   /// )
   /// ```
-  final bool Function(String header)? forwardHeader;
+  final bool Function(String header)? appendHeader;
 
   @override
   Future<StreamedResponse> send(BaseRequest request) async {
@@ -52,7 +52,7 @@ class TelemetryHttpClient extends BaseClient {
     final response = await inner.send(request);
     final contentLength = request.contentLength;
     stopwatch.stop();
-    final headers = _filteredHeaders(forwardHeader, request.headers);
+    final headers = _filteredHeaders(appendHeader, request.headers);
     telemetryClient.trackRequest(
       id: _generateRequestId(),
       url: request.url.toString(),
@@ -86,10 +86,10 @@ String _generateRequestId() {
   return result.toString();
 }
 
-String _filteredHeaders(bool Function(String header)? forwardHeader, Map<String, String> headers) {
+String _filteredHeaders(bool Function(String header)? appendHeader, Map<String, String> headers) {
   final buffer = <String>[];
   headers.forEach((header, value) {
-    if (forwardHeader?.call(header) ?? true) {
+    if (appendHeader?.call(header) ?? true) {
       buffer.add('$header=$value');
     }
   });

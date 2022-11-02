@@ -243,7 +243,7 @@ void _telemetryHttpClient() {
           final sut = TelemetryHttpClient(
             inner: inner,
             telemetryClient: telemetryClient,
-            forwardHeader: (_) => false,
+            appendHeader: (_) => false,
           );
           await sut.post(
             Uri.parse('http://www.whatever.com'),
@@ -281,7 +281,7 @@ void _telemetryHttpClient() {
           final sut = TelemetryHttpClient(
             inner: inner,
             telemetryClient: telemetryClient,
-            forwardHeader: (header) => header == 'first' || header == 'third',
+            appendHeader: (header) => header == 'first' || header == 'third',
           );
           await sut.post(
             Uri.parse('http://www.whatever.com'),
