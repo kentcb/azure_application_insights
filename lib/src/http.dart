@@ -52,7 +52,7 @@ class TelemetryHttpClient extends BaseClient {
     final response = await inner.send(request);
     final contentLength = request.contentLength;
     stopwatch.stop();
-    final headers = _filteredHeaders(appendHeader, request.headers);
+    final headers = _filterHeaders(appendHeader, request.headers);
     telemetryClient.trackRequest(
       id: _generateRequestId(),
       url: request.url.toString(),
@@ -86,7 +86,7 @@ String _generateRequestId() {
   return result.toString();
 }
 
-String _filteredHeaders(bool Function(String header)? appendHeader, Map<String, String> headers) {
+String _filterHeaders(bool Function(String header)? appendHeader, Map<String, String> headers) {
   final buffer = <String>[];
   headers.forEach((header, value) {
     if (appendHeader?.call(header) ?? true) {
