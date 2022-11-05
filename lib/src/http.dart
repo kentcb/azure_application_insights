@@ -15,6 +15,7 @@ class TelemetryHttpClient extends BaseClient {
   TelemetryHttpClient({
     required this.inner,
     required this.telemetryClient,
+    this.appendHeader,
   });
 
   /// The inner HTTP client.
@@ -23,13 +24,41 @@ class TelemetryHttpClient extends BaseClient {
   /// The telemetry client.
   final TelemetryClient telemetryClient;
 
+  /// Callback that determines whether or not to append certain header.
+  ///
+  /// [appendHeader] defaults to null, meaning all headers will be appended. Other examples:
+  ///
+  /// If only header named 'foo' should be appended when tracking request:
+  /// ```dart
+  /// TelemetryHttpClient(
+  ///   ...
+  ///   appendHeader: (header) => header == 'foo',
+  /// )
+  /// ```
+  ///
+  /// If no headers should be appended when tracking request:
+  /// ```dart
+  /// TelemetryHttpClient(
+  ///   ...
+  ///   appendHeader: (_) => false,
+  /// )
+  /// ```
+  final bool Function(String header)? appendHeader;
+
   @override
   Future<StreamedResponse> send(BaseRequest request) async {
-    final stopwatch = Stopwatch()..start();
     final timestamp = DateTime.now().toUtc();
+
+    final stopwatch = Stopwatch()..start();
     final response = await inner.send(request);
-    final contentLength = request.contentLength;
     stopwatch.stop();
+
+    final contentLength = request.contentLength;
+    final appendHeader = this.appendHeader ?? (_) => true;
+    final headers = request.headers.entries
+        .where((e) => appendHeader(e.key))
+        .map((e) => '${e.key}=${e.value}')
+        .join(',');
     telemetryClient.trackRequest(
       id: _generateRequestId(),
       url: request.url.toString(),
@@ -38,8 +67,7 @@ class TelemetryHttpClient extends BaseClient {
       success: response.statusCode >= 200 && response.statusCode < 300,
       additionalProperties: <String, Object>{
         'method': request.method,
-        'headers':
-            request.headers.entries.map((e) => '${e.key}=${e.value}').join(','),
+        if (headers.isNotEmpty) 'headers': headers,
         if (contentLength != null) 'contentLength': contentLength,
       },
       timestamp: timestamp,
