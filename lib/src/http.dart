@@ -29,7 +29,7 @@ class TelemetryHttpClient extends BaseClient {
   /// [appendHeader] defaults to null, meaning all headers will be appended. Other examples:
   ///
   /// If only header named 'foo' should be appended when tracking request:
-  /// ``` dart
+  /// ```dart
   /// TelemetryHttpClient(
   ///   ...
   ///   appendHeader: (header) => header == 'foo',
@@ -37,7 +37,7 @@ class TelemetryHttpClient extends BaseClient {
   /// ```
   ///
   /// If no headers should be appended when tracking request:
-  /// ``` dart
+  /// ```dart
   /// TelemetryHttpClient(
   ///   ...
   ///   appendHeader: (_) => false,
@@ -47,12 +47,18 @@ class TelemetryHttpClient extends BaseClient {
 
   @override
   Future<StreamedResponse> send(BaseRequest request) async {
-    final stopwatch = Stopwatch()..start();
     final timestamp = DateTime.now().toUtc();
+
+    final stopwatch = Stopwatch()..start();
     final response = await inner.send(request);
-    final contentLength = request.contentLength;
     stopwatch.stop();
-    final headers = _filterHeaders(appendHeader, request.headers);
+
+    final contentLength = request.contentLength;
+    final appendHeader = this.appendHeader ?? (_) => true;
+    final headers = request.headers.entries
+        .where((e) => appendHeader(e.key))
+        .map((e) => '${e.key}=${e.value}')
+        .join(',');
     telemetryClient.trackRequest(
       id: _generateRequestId(),
       url: request.url.toString(),
@@ -84,14 +90,4 @@ String _generateRequestId() {
   }
 
   return result.toString();
-}
-
-String _filterHeaders(bool Function(String header)? appendHeader, Map<String, String> headers) {
-  final buffer = <String>[];
-  headers.forEach((header, value) {
-    if (appendHeader?.call(header) ?? true) {
-      buffer.add('$header=$value');
-    }
-  });
-  return buffer.join(',');
 }
