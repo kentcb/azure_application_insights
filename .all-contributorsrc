@@ -25,6 +25,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "RCSandberg",
+      "name": "Robert Sandberg",
+      "avatar_url": "https://avatars.githubusercontent.com/u/18184100?v=4",
+      "profile": "http://www.sandbergit.se",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
@@ -32,5 +41,6 @@
   "projectOwner": "kentcb",
   "repoType": "github",
   "repoHost": "https://github.com",
-  "skipCi": true
+  "skipCi": true,
+  "commitConvention": "angular"
 }
