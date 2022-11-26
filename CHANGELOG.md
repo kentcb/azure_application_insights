@@ -1,3 +1,7 @@
+## 3.1.0
+
+- Add ability to filter headers sent by `TelemetryHttpClient` (thanks @RCSandberg)
+
 ## 3.0.0
 
 - Fix `TelemetryContext` so that the various getters and setters are nullable (thanks @mernen)
