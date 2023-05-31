@@ -8,7 +8,7 @@ environment:
 
 dependencies:
   crypto: ^3.0.0
-  http: ^1.0.0
+  http: '>=0.13.6 <2.0.0'
   logging: ^1.2.0
   meta: ^1.9.1
   stack_trace: ^1.11.0
