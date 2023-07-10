@@ -3,6 +3,7 @@
 import 'dart:async';
 
 import 'package:azure_application_insights/azure_application_insights.dart';
+import 'package:http/http.dart';
 import 'package:mockito/mockito.dart';
 import 'package:test/test.dart';
 
@@ -13,6 +14,7 @@ void main() {
 }
 
 void _telemetryHttpClient() {
+  provideDummy<ByteStream>(ByteStream.fromBytes([]));
   group(
     'TelemetryHttpClient',
     () {
