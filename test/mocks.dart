@@ -37,6 +37,9 @@ class MockClient extends MockClientBase {
 
 class MockStreamedResponse extends MockStreamedResponseBase {
   MockStreamedResponse() {
+    // ByteStream is a final class, so we need to provide a dummy in order to call when(stream) below.
+    provideDummy(ByteStream.fromBytes([]));
+
     when(request).thenAnswer((_) => null);
     when(headers).thenAnswer((_) => const <String, String>{});
     when(isRedirect).thenAnswer((_) => false);
