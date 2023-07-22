@@ -1,3 +1,7 @@
+## 4.0.0
+
+- Upgrade to Dart 3
+
 ## 3.1.0
 
 - Add ability to filter headers sent by `TelemetryHttpClient` (thanks @RCSandberg)
