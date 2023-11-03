@@ -196,10 +196,15 @@ class TransmissionProcessor implements Processor {
     );
     final encoded = jsonEncode(serialized);
 
+    var headers = <String, String>{
+      'Sdk-Context': 'appId'
+    };
+    
     try {
       final response = await httpClient
           .post(
             _ingestionEndpointUri,
+            headers: headers,
             body: encoded,
           )
           .timeout(timeout);
