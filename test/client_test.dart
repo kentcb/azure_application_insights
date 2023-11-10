@@ -12,6 +12,7 @@ void main() {
   _trackEvent();
   _trackPageView();
   _trackRequest();
+  _trackDependency();
   _trackTrace();
   _flush();
 }
@@ -63,11 +64,7 @@ void _trackError() {
           );
 
           expect(
-            verify(processor.process(
-                    contextualTelemetryItems:
-                        captureAnyNamed('contextualTelemetryItems')))
-                .captured
-                .single,
+            verify(processor.process(contextualTelemetryItems: captureAnyNamed('contextualTelemetryItems'))).captured.single,
             predicate<List<ContextualTelemetryItem>>((v) {
               if (v.length != 1) {
                 return false;
@@ -76,8 +73,7 @@ void _trackError() {
               final telemetry = v[0].telemetryItem;
 
               if (telemetry is ExceptionTelemetryItem) {
-                return telemetry.severity == Severity.critical &&
-                    telemetry.error == 'an error';
+                return telemetry.severity == Severity.critical && telemetry.error == 'an error';
               }
 
               return false;
@@ -103,11 +99,7 @@ void _trackEvent() {
           );
 
           expect(
-            verify(processor.process(
-                    contextualTelemetryItems:
-                        captureAnyNamed('contextualTelemetryItems')))
-                .captured
-                .single,
+            verify(processor.process(contextualTelemetryItems: captureAnyNamed('contextualTelemetryItems'))).captured.single,
             predicate<List<ContextualTelemetryItem>>((v) {
               if (v.length != 1) {
                 return false;
@@ -142,11 +134,7 @@ void _trackPageView() {
           );
 
           expect(
-            verify(processor.process(
-                    contextualTelemetryItems:
-                        captureAnyNamed('contextualTelemetryItems')))
-                .captured
-                .single,
+            verify(processor.process(contextualTelemetryItems: captureAnyNamed('contextualTelemetryItems'))).captured.single,
             predicate<List<ContextualTelemetryItem>>((v) {
               if (v.length != 1) {
                 return false;
@@ -183,11 +171,7 @@ void _trackRequest() {
           );
 
           expect(
-            verify(processor.process(
-                    contextualTelemetryItems:
-                        captureAnyNamed('contextualTelemetryItems')))
-                .captured
-                .single,
+            verify(processor.process(contextualTelemetryItems: captureAnyNamed('contextualTelemetryItems'))).captured.single,
             predicate<List<ContextualTelemetryItem>>((v) {
               if (v.length != 1) {
                 return false;
@@ -196,9 +180,51 @@ void _trackRequest() {
               final telemetry = v[0].telemetryItem;
 
               if (telemetry is RequestTelemetryItem) {
-                return telemetry.id == 'a request' &&
+                return telemetry.id == 'a request' && telemetry.duration == const Duration(milliseconds: 283) && telemetry.responseCode == '200';
+              }
+
+              return false;
+            }),
+          );
+        },
+      );
+    },
+  );
+}
+
+void _trackDependency() {
+  group(
+    'trackDependency',
+    () {
+      test(
+        'creates dependency telemetry and forwards to processor',
+        () {
+          final processor = MockProcessor();
+          final sut = TelemetryClient(processor: processor);
+          sut.trackDependency(
+              id: 'a dependency call',
+              duration: const Duration(milliseconds: 283),
+              resultCode: '200',
+              type: 'customType',
+              name: 'somename',
+              data: 'somedata');
+
+          expect(
+            verify(processor.process(contextualTelemetryItems: captureAnyNamed('contextualTelemetryItems'))).captured.single,
+            predicate<List<ContextualTelemetryItem>>((v) {
+              if (v.length != 1) {
+                return false;
+              }
+
+              final telemetry = v[0].telemetryItem;
+
+              if (telemetry is DependencyTelemetryItem) {
+                return telemetry.id == 'a dependency call' &&
                     telemetry.duration == const Duration(milliseconds: 283) &&
-                    telemetry.responseCode == '200';
+                    telemetry.resultCode == '200' &&
+                    telemetry.type == 'customType' &&
+                    telemetry.name == 'somename' &&
+                    telemetry.data == 'somedata';
               }
 
               return false;
@@ -225,11 +251,7 @@ void _trackTrace() {
           );
 
           expect(
-            verify(processor.process(
-                    contextualTelemetryItems:
-                        captureAnyNamed('contextualTelemetryItems')))
-                .captured
-                .single,
+            verify(processor.process(contextualTelemetryItems: captureAnyNamed('contextualTelemetryItems'))).captured.single,
             predicate<List<ContextualTelemetryItem>>((v) {
               if (v.length != 1) {
                 return false;
@@ -238,8 +260,7 @@ void _trackTrace() {
               final telemetry = v[0].telemetryItem;
 
               if (telemetry is TraceTelemetryItem) {
-                return telemetry.severity == Severity.critical &&
-                    telemetry.message == 'a message';
+                return telemetry.severity == Severity.critical && telemetry.message == 'a message';
               }
 
               return false;

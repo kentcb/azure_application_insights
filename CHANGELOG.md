@@ -1,3 +1,7 @@
+## 4.0.1
+
+-  Ability to track dependency Calls
+
 ## 4.0.0
 
 - Upgrade to Dart 3
