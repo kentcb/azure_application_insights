@@ -103,8 +103,7 @@ class ExceptionTelemetryItem implements TelemetryItem {
   Map<String, dynamic> serialize({
     required TelemetryContext context,
   }) {
-    final trace =
-        stackTrace == null ? null : Trace.parse(stackTrace.toString());
+    final trace = stackTrace == null ? null : Trace.parse(stackTrace.toString());
     return <String, dynamic>{
       'baseType': 'ExceptionData',
       'baseData': <String, dynamic>{
@@ -124,8 +123,7 @@ class ExceptionTelemetryItem implements TelemetryItem {
 
   String _generateProblemId(Trace? trace) {
     // Make a best effort at disambiguating errors by using the error message and the first frame from any available stack trace.
-    final code =
-        '$error${trace == null || trace.frames.isEmpty ? '' : trace.frames[0].toString()}';
+    final code = '$error${trace == null || trace.frames.isEmpty ? '' : trace.frames[0].toString()}';
     final codeBytes = utf8.encode(code);
     final hash = sha1.convert(codeBytes);
     final result = hash.toString();
@@ -270,6 +268,81 @@ class RequestTelemetryItem implements TelemetryItem {
           if (name != null) 'name': name,
           if (success != null) 'success': success,
           if (url != null) 'url': url,
+          'properties': <String, dynamic>{
+            ...context.properties,
+            ...additionalProperties,
+          }
+        },
+      };
+}
+
+/// Represents a dependency telemetry item in Application Insights. Should be used to track Requests made to a backend.
+@immutable
+class DependencyTelemetryItem implements TelemetryItem {
+  /// Creates an instance of [DependencyTelemetryItem] with the specified [id], [duration], and [responseCode].
+  DependencyTelemetryItem({
+    required this.id,
+    required this.duration,
+    required this.resultCode,
+    this.type,
+    this.target,
+    this.name,
+    this.success,
+    this.data,
+    this.additionalProperties = const <String, Object>{},
+    DateTime? timestamp,
+  })  : assert(timestamp == null || timestamp.isUtc),
+        timestamp = timestamp ?? DateTime.now().toUtc();
+
+  @override
+  String get envelopeName => 'AppDependency';
+
+  @override
+  final DateTime timestamp;
+
+  /// The ID of the dependency call.
+  final String id;
+
+  /// The duration of the dependency call.
+  final Duration duration;
+
+  /// The result code for the dependency call.
+  final String resultCode;
+
+  /// The type of the dependency, which is optional. (Examples: sql, http, ajax)
+  final String? type;
+
+  /// The target of the dependency call, which is optional. (Examples: server name and host address)
+  final String? target;
+
+  /// The name of the dependency call, which is optional.
+  final String? name;
+
+  /// Whether the dependency call was successful or not, which is optional.
+  final bool? success;
+
+  /// This field is the command initiated by this dependency call, which is optional. (Examples: HTTP URL with all query parameters)
+  final String? data;
+
+  /// Any additional properties to submit with the telemetry.
+  final Map<String, Object> additionalProperties;
+
+  @override
+  Map<String, dynamic> serialize({
+    required TelemetryContext context,
+  }) =>
+      <String, dynamic>{
+        'baseType': 'RemoteDependencyData',
+        'baseData': <String, dynamic>{
+          'ver': 2,
+          'id': id,
+          'duration': formatDurationForDotNet(duration),
+          'resultCode': resultCode,
+          'type': type ?? "Ajax",
+          if (target != null) 'target': target,
+          if (name != null) 'name': name,
+          if (success != null) 'success': success,
+          if (data != null) 'data': data,
           'properties': <String, dynamic>{
             ...context.properties,
             ...additionalProperties,
