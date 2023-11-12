@@ -1,6 +1,10 @@
+## 4.1.0
+
+-  Ability to track dependency calls
+
 ## 4.0.1
 
--  Ability to track dependency Calls
+- Downgrade `stack_trace` package for Flutter compatibility (thanks @robsonsilv4)
 
 ## 4.0.0
 
