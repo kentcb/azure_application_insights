@@ -1,3 +1,7 @@
+## 4.0.1
+
+- Downgrade `stack_trace` package for Flutter compatibility (thanks @robsonsilv4)
+
 ## 4.0.0
 
 - Upgrade to Dart 3
