@@ -9,7 +9,7 @@
       "login": "kentcb",
       "name": "Kent Boogaart",
       "avatar_url": "https://avatars2.githubusercontent.com/u/1901832?v=4",
-      "profile": "http://kent-boogaart.com/",
+      "profile": "https://kent-boogaart.com/",
       "contributions": [
         "code",
         "test",
@@ -30,7 +30,16 @@
       "login": "RCSandberg",
       "name": "Robert Sandberg",
       "avatar_url": "https://avatars.githubusercontent.com/u/18184100?v=4",
-      "profile": "http://www.sandbergit.se",
+      "profile": "https://www.sandbergit.se",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "robsonsilv4",
+      "name": "Robson Silva",
+      "avatar_url": "https://avatars.githubusercontent.com/u/17673296?v=4",
+      "profile": "https://robsonsilva.dev",
       "contributions": [
         "code"
       ]
@@ -42,5 +51,6 @@
   "repoType": "github",
   "repoHost": "https://github.com",
   "skipCi": true,
-  "commitConvention": "angular"
+  "commitConvention": "angular",
+  "commitType": "docs"
 }
