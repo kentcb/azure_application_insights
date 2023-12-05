@@ -85,6 +85,35 @@ Future<void> _sendTelemetry() async {
       },
     );
 
+    // Here is a page view telemetry
+    telemetryClient.trackPageView(
+      name: 'About Us Page',
+      additionalProperties: <String, Object>{
+        'navigated_from': 'Settings page',
+      },
+    );
+
+    // Here is a error telemetry with stacktrace
+    thrower() {
+      ghi() => throw Exception('This is a real exception!');
+      def() => ghi();
+      abc() => def();
+      abc();
+    }
+
+    try {
+      thrower();
+    } catch (error, stacktrace) {
+      telemetryClient.trackError(
+        severity: Severity.error,
+        error: error,
+        stackTrace: stacktrace,
+        additionalProperties: <String, Object>{
+          'customParameter': 'This is a custom parameter for error message',
+        },
+      );
+    }
+
     // You can automatically submit HTTP traffic as request telemetry by using a TelemetryHttpClient. This will include
     // the duration of the request. Check the requests events inside Application Insights to see the details of the below
     // request.
