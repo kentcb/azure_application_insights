@@ -1,6 +1,6 @@
 ## 4.0.1
 
-- Downgrade `stack_trace` package for Flutter compatibility (thanks @robsonsilv4)
+- Downgrade `stack_trace` package for Flutter casdfsdompatibility (thanks @robsonsilv4)
 
 ## 4.0.0
 
