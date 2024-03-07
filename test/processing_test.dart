@@ -1,6 +1,7 @@
 // ignore_for_file: cascade_invocations
 
 import 'package:azure_application_insights/azure_application_insights.dart';
+import 'package:http/http.dart';
 import 'package:mockito/mockito.dart';
 import 'package:quiver/testing/async.dart';
 import 'package:test/test.dart';
@@ -215,6 +216,63 @@ void _transmissionProcessor() {
                   contextualTelemetryItems:
                       anyNamed('contextualTelemetryItems')))
               .called(1);
+        },
+      );
+
+      test(
+        'failureCallback is called when an error is thrown on transmit',
+        () {
+          final callback = MockCallbacks().failureCallback;
+          final httpClient = MockClient();
+          when(httpClient.post(any, body: anyNamed("body"))).thenThrow(Error());
+          final sut = TransmissionProcessor(
+            instrumentationKey: 'key',
+            httpClient: httpClient,
+            timeout: const Duration(seconds: 10),
+            failureCallback: callback,
+          );
+          sut.process(
+            contextualTelemetryItems: [
+              ContextualTelemetryItem(
+                telemetryItem: EventTelemetryItem(
+                  name: 'anything',
+                  timestamp: DateTime.utc(2020, 10, 26),
+                ),
+                context: TelemetryContext(),
+              ),
+            ],
+          );
+
+          verify(callback(contextualTelemetry: anyNamed("contextualTelemetry"), error: anyNamed("error"))).called(1);
+        },
+      );
+
+      test(
+        'failureCallback is called when response code is not 2XX on transmit',
+        () {
+          final callback = MockCallbacks().failureCallback;
+          final httpClient = MockClient();
+          when(httpClient.post(any, body: anyNamed("body"))).thenAnswer((_) async => Response("", 300));
+          final sut = TransmissionProcessor(
+            instrumentationKey: 'key',
+            httpClient: httpClient,
+            timeout: const Duration(seconds: 10),
+            failureCallback: callback,
+          );
+          sut.process(
+            contextualTelemetryItems: [
+              ContextualTelemetryItem(
+                telemetryItem: EventTelemetryItem(
+                  name: 'anything',
+                  timestamp: DateTime.utc(2020, 10, 26),
+                ),
+                context: TelemetryContext(),
+              ),
+            ],
+          );
+          Future(expectAsync0(() {
+            verify(callback(contextualTelemetry: anyNamed("contextualTelemetry"), statusCode: anyNamed("statusCode"))).called(1);
+          }));
         },
       );
     },

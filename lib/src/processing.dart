@@ -157,7 +157,7 @@ class TransmissionProcessor implements Processor {
   final Logger logger;
 
   /// Optional callback method to handle failures to submit telemetry.
-  final Function({List<ContextualTelemetryItem> contextualTelemetry, int? statusCode, Object? error})? failureCallback;
+  final void Function({required List<ContextualTelemetryItem> contextualTelemetry, int? statusCode, Object? error})? failureCallback;
 
   final Uri _ingestionEndpointUri;
   final Set<Future<void>> _outstandingFutures;

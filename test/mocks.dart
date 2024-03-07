@@ -12,12 +12,18 @@ export 'mocks.mocks.dart';
     Processor,
     Response,
     TelemetryClient,
+    Callbacks,
   ],
   customMocks: [
     MockSpec<Client>(as: #MockClientBase),
     MockSpec<StreamedResponse>(as: #MockStreamedResponseBase),
   ],
 )
+
+abstract class Callbacks {
+  void failureCallback({required List<ContextualTelemetryItem> contextualTelemetry, int? statusCode, Object? error});
+}
+
 class MockClient extends MockClientBase {
   MockClient() {
     when(
