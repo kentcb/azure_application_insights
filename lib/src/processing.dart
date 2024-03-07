@@ -128,6 +128,7 @@ class TransmissionProcessor implements Processor {
     required this.httpClient,
     required this.timeout,
     Logger? logger,
+    this.failureCallback,
     this.ingestionEndpoint = 'https://dc.services.visualstudio.com/v2/track',
     this.next,
   })  : logger = logger ?? Logger('TransmissionProcessor'),
@@ -154,6 +155,9 @@ class TransmissionProcessor implements Processor {
 
   /// A [Logger] to which processing information will be written.
   final Logger logger;
+
+  /// Optional callback method to handle failures to submit telemetry.
+  final void Function({required List<ContextualTelemetryItem> contextualTelemetry, int? statusCode, Object? error})? failureCallback;
 
   final Uri _ingestionEndpointUri;
   final Set<Future<void>> _outstandingFutures;
@@ -207,9 +211,11 @@ class TransmissionProcessor implements Processor {
 
       if (!result) {
         logger.severe('Failed to submit telemetry: ${response.statusCode}');
+        failureCallback?.call(contextualTelemetry: contextualTelemetry, statusCode: response.statusCode);
       }
     } on Object catch (e) {
       logger.warning('Failed to submit telemetry: $e');
+      failureCallback?.call(contextualTelemetry: contextualTelemetry, error: e);
     }
   }
 
