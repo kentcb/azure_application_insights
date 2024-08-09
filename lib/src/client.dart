@@ -135,7 +135,7 @@ class TelemetryClient {
     required String id,
     required Duration duration,
     required String resultCode,
-    String? type,
+    required String type,
     String? target,
     String? name,
     bool? success,

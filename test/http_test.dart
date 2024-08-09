@@ -197,7 +197,8 @@ void _telemetryHttpClient() {
           expect(properties.length, 3);
           expect(properties['method'], 'POST');
           expect(properties['contentLength'], 6);
-          expect(properties['headers'], 'first=value1,second=value2,content-type=text/plain; charset=utf-8');
+          expect(properties['headers'],
+              'first=value1,second=value2,content-type=text/plain; charset=utf-8');
         },
       );
 

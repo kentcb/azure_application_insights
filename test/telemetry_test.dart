@@ -36,7 +36,8 @@ void _eventTelemetry() {
               timestamp: DateTime(2020, 10, 26).toUtc(),
             ),
             context: TelemetryContext(),
-            expectedJson: '{"baseType":"EventData","baseData":{"ver":2,"name":"SomeEvent","properties":{}}}',
+            expectedJson:
+                '{"baseType":"EventData","baseData":{"ver":2,"name":"SomeEvent","properties":{}}}',
           );
 
           _verifyDataMap(
@@ -48,7 +49,8 @@ void _eventTelemetry() {
               },
             ),
             context: TelemetryContext()..properties['foo'] = 'bar',
-            expectedJson: '{"baseType":"EventData","baseData":{"ver":2,"name":"SomeEvent","properties":{"foo":"bar","another":1}}}',
+            expectedJson:
+                '{"baseType":"EventData","baseData":{"ver":2,"name":"SomeEvent","properties":{"foo":"bar","another":1}}}',
           );
         },
       );
@@ -98,7 +100,8 @@ void _exceptionTelemetry() {
             telemetry: ExceptionTelemetryItem(
               severity: Severity.critical,
               error: 'an error with stack trace',
-              stackTrace: StackTrace.fromString('#0      _first\n#1      _second'),
+              stackTrace:
+                  StackTrace.fromString('#0      _first\n#1      _second'),
             ),
             context: TelemetryContext(),
             expectedJson:
@@ -135,7 +138,8 @@ void _pageViewTelemetry() {
               name: 'SomePage',
             ),
             context: TelemetryContext(),
-            expectedJson: '{"baseType":"PageViewData","baseData":{"ver":2,"name":"SomePage","properties":{}}}',
+            expectedJson:
+                '{"baseType":"PageViewData","baseData":{"ver":2,"name":"SomePage","properties":{}}}',
           );
 
           _verifyDataMap(
@@ -144,7 +148,8 @@ void _pageViewTelemetry() {
               id: 'an-id',
             ),
             context: TelemetryContext(),
-            expectedJson: '{"baseType":"PageViewData","baseData":{"ver":2,"name":"SomePageWithId","id":"an-id","properties":{}}}',
+            expectedJson:
+                '{"baseType":"PageViewData","baseData":{"ver":2,"name":"SomePageWithId","id":"an-id","properties":{}}}',
           );
 
           _verifyDataMap(
@@ -153,7 +158,8 @@ void _pageViewTelemetry() {
               duration: const Duration(milliseconds: 1268),
             ),
             context: TelemetryContext(),
-            expectedJson: '{"baseType":"PageViewData","baseData":{"ver":2,"name":"SomePageWithDuration","duration":'
+            expectedJson:
+                '{"baseType":"PageViewData","baseData":{"ver":2,"name":"SomePageWithDuration","duration":'
                 '"00:00:01.268000","properties":{}}}',
           );
 
@@ -163,7 +169,8 @@ void _pageViewTelemetry() {
               url: 'http://something/',
             ),
             context: TelemetryContext(),
-            expectedJson: '{"baseType":"PageViewData","baseData":{"ver":2,"name":"SomePageWithUrl","url":"http://something/",'
+            expectedJson:
+                '{"baseType":"PageViewData","baseData":{"ver":2,"name":"SomePageWithUrl","url":"http://something/",'
                 '"properties":{}}}',
           );
 
@@ -175,7 +182,8 @@ void _pageViewTelemetry() {
               },
             ),
             context: TelemetryContext()..properties['foo'] = 'bar',
-            expectedJson: '{"baseType":"PageViewData","baseData":{"ver":2,"name":"SomePageWithProperties","properties":'
+            expectedJson:
+                '{"baseType":"PageViewData","baseData":{"ver":2,"name":"SomePageWithProperties","properties":'
                 '{"foo":"bar","another":1}}}',
           );
         },
@@ -198,7 +206,8 @@ void _requestTelemetry() {
               responseCode: '200',
             ),
             context: TelemetryContext(),
-            expectedJson: '{"baseType":"RequestData","baseData":{"ver":2,"id":"request-id","duration":"00:00:02.301000",'
+            expectedJson:
+                '{"baseType":"RequestData","baseData":{"ver":2,"id":"request-id","duration":"00:00:02.301000",'
                 '"responseCode":"200","properties":{}}}',
           );
 
@@ -210,7 +219,8 @@ void _requestTelemetry() {
               source: 'a source',
             ),
             context: TelemetryContext(),
-            expectedJson: '{"baseType":"RequestData","baseData":{"ver":2,"id":"request-with-source","duration":"00:00:02.301000",'
+            expectedJson:
+                '{"baseType":"RequestData","baseData":{"ver":2,"id":"request-with-source","duration":"00:00:02.301000",'
                 '"responseCode":"200","source":"a source","properties":{}}}',
           );
 
@@ -222,7 +232,8 @@ void _requestTelemetry() {
               name: 'a name',
             ),
             context: TelemetryContext(),
-            expectedJson: '{"baseType":"RequestData","baseData":{"ver":2,"id":"request-with-name","duration":"00:00:02.301000",'
+            expectedJson:
+                '{"baseType":"RequestData","baseData":{"ver":2,"id":"request-with-name","duration":"00:00:02.301000",'
                 '"responseCode":"200","name":"a name","properties":{}}}',
           );
 
@@ -234,7 +245,8 @@ void _requestTelemetry() {
               success: true,
             ),
             context: TelemetryContext(),
-            expectedJson: '{"baseType":"RequestData","baseData":{"ver":2,"id":"request-with-success","duration":"00:00:02.301000",'
+            expectedJson:
+                '{"baseType":"RequestData","baseData":{"ver":2,"id":"request-with-success","duration":"00:00:02.301000",'
                 '"responseCode":"200","success":true,"properties":{}}}',
           );
 
@@ -246,7 +258,8 @@ void _requestTelemetry() {
               url: 'http://somewhere/',
             ),
             context: TelemetryContext(),
-            expectedJson: '{"baseType":"RequestData","baseData":{"ver":2,"id":"request-with-url","duration":"00:00:02.301000",'
+            expectedJson:
+                '{"baseType":"RequestData","baseData":{"ver":2,"id":"request-with-url","duration":"00:00:02.301000",'
                 '"responseCode":"200","url":"http://somewhere/","properties":{}}}',
           );
 
@@ -260,7 +273,8 @@ void _requestTelemetry() {
               },
             ),
             context: TelemetryContext()..properties['foo'] = 'bar',
-            expectedJson: '{"baseType":"RequestData","baseData":{"ver":2,"id":"request-with-properties","duration":"00:00:02.301000"'
+            expectedJson:
+                '{"baseType":"RequestData","baseData":{"ver":2,"id":"request-with-properties","duration":"00:00:02.301000"'
                 ',"responseCode":"200","properties":{"foo":"bar","another":1}}}',
           );
         },
@@ -281,72 +295,12 @@ void _dependencyTelemetry() {
               id: 'dependency-id',
               duration: const Duration(milliseconds: 2301),
               resultCode: '200',
+              type: 'HTTP',
             ),
             context: TelemetryContext(),
-            expectedJson: '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"id":"dependency-id","duration":"00:00:02.301000",'
-                '"resultCode":"200","type":"Ajax","properties":{}}}',
-          );
-
-          _verifyDataMap(
-            telemetry: DependencyTelemetryItem(
-              id: 'dependency-with-target',
-              duration: const Duration(milliseconds: 2301),
-              resultCode: '200',
-              target: 'https://someserver.com',
-            ),
-            context: TelemetryContext(),
-            expectedJson: '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"id":"dependency-with-target","duration":"00:00:02.301000",'
-                '"resultCode":"200","type":"Ajax","target":"https://someserver.com","properties":{}}}',
-          );
-
-          _verifyDataMap(
-            telemetry: DependencyTelemetryItem(
-              id: 'dependency-with-name',
-              duration: const Duration(milliseconds: 2301),
-              resultCode: '200',
-              name: 'a name',
-            ),
-            context: TelemetryContext(),
-            expectedJson: '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"id":"dependency-with-name","duration":"00:00:02.301000",'
-                '"resultCode":"200","type":"Ajax","name":"a name","properties":{}}}',
-          );
-
-          _verifyDataMap(
-            telemetry: DependencyTelemetryItem(
-              id: 'dependency-with-success',
-              duration: const Duration(milliseconds: 2301),
-              resultCode: '200',
-              success: true,
-            ),
-            context: TelemetryContext(),
-            expectedJson: '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"id":"dependency-with-success","duration":"00:00:02.301000",'
-                '"resultCode":"200","type":"Ajax","success":true,"properties":{}}}',
-          );
-
-          _verifyDataMap(
-            telemetry: DependencyTelemetryItem(
-              id: 'dependency-with-data',
-              duration: const Duration(milliseconds: 2301),
-              resultCode: '200',
-              data: 'http://somewhere/',
-            ),
-            context: TelemetryContext(),
-            expectedJson: '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"id":"dependency-with-data","duration":"00:00:02.301000",'
-                '"resultCode":"200","type":"Ajax","data":"http://somewhere/","properties":{}}}',
-          );
-
-          _verifyDataMap(
-            telemetry: DependencyTelemetryItem(
-              id: 'dependency-with-properties',
-              duration: const Duration(milliseconds: 2301),
-              resultCode: '200',
-              additionalProperties: const <String, Object>{
-                'another': 1,
-              },
-            ),
-            context: TelemetryContext()..properties['foo'] = 'bar',
-            expectedJson: '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"id":"dependency-with-properties","duration":"00:00:02.301000"'
-                ',"resultCode":"200","type":"Ajax","properties":{"foo":"bar","another":1}}}',
+            expectedJson:
+                '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"id":"dependency-id","duration":"00:00:02.301000",'
+                '"resultCode":"200","type":"HTTP","properties":{}}}',
           );
 
           _verifyDataMap(
@@ -357,8 +311,81 @@ void _dependencyTelemetry() {
               type: 'sometype',
             ),
             context: TelemetryContext(),
-            expectedJson: '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"id":"dependency-with-type","duration":"00:00:02.301000",'
+            expectedJson:
+                '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"id":"dependency-with-type","duration":"00:00:02.301000",'
                 '"resultCode":"200","type":"sometype","properties":{}}}',
+          );
+
+          _verifyDataMap(
+            telemetry: DependencyTelemetryItem(
+              id: 'dependency-with-target',
+              duration: const Duration(milliseconds: 2301),
+              resultCode: '200',
+              type: 'HTTP',
+              target: 'https://someserver.com',
+            ),
+            context: TelemetryContext(),
+            expectedJson:
+                '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"id":"dependency-with-target","duration":"00:00:02.301000",'
+                '"resultCode":"200","type":"HTTP","target":"https://someserver.com","properties":{}}}',
+          );
+
+          _verifyDataMap(
+            telemetry: DependencyTelemetryItem(
+              id: 'dependency-with-name',
+              duration: const Duration(milliseconds: 2301),
+              resultCode: '200',
+              type: 'HTTP',
+              name: 'a name',
+            ),
+            context: TelemetryContext(),
+            expectedJson:
+                '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"id":"dependency-with-name","duration":"00:00:02.301000",'
+                '"resultCode":"200","type":"HTTP","name":"a name","properties":{}}}',
+          );
+
+          _verifyDataMap(
+            telemetry: DependencyTelemetryItem(
+              id: 'dependency-with-success',
+              duration: const Duration(milliseconds: 2301),
+              resultCode: '200',
+              type: 'HTTP',
+              success: true,
+            ),
+            context: TelemetryContext(),
+            expectedJson:
+                '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"id":"dependency-with-success","duration":"00:00:02.301000",'
+                '"resultCode":"200","type":"HTTP","success":true,"properties":{}}}',
+          );
+
+          _verifyDataMap(
+            telemetry: DependencyTelemetryItem(
+              id: 'dependency-with-data',
+              duration: const Duration(milliseconds: 2301),
+              resultCode: '200',
+              type: 'HTTP',
+              data: 'http://somewhere/',
+            ),
+            context: TelemetryContext(),
+            expectedJson:
+                '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"id":"dependency-with-data","duration":"00:00:02.301000",'
+                '"resultCode":"200","type":"HTTP","data":"http://somewhere/","properties":{}}}',
+          );
+
+          _verifyDataMap(
+            telemetry: DependencyTelemetryItem(
+              id: 'dependency-with-properties',
+              duration: const Duration(milliseconds: 2301),
+              resultCode: '200',
+              type: 'HTTP',
+              additionalProperties: const <String, Object>{
+                'another': 1,
+              },
+            ),
+            context: TelemetryContext()..properties['foo'] = 'bar',
+            expectedJson:
+                '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"id":"dependency-with-properties","duration":"00:00:02.301000"'
+                ',"resultCode":"200","type":"HTTP","properties":{"foo":"bar","another":1}}}',
           );
         },
       );
@@ -379,7 +406,8 @@ void _traceTelemetry() {
               message: 'a trace',
             ),
             context: TelemetryContext(),
-            expectedJson: '{"baseType":"MessageData","baseData":{"ver":2,"severityLevel":4,"message":"a trace","properties":{}}}',
+            expectedJson:
+                '{"baseType":"MessageData","baseData":{"ver":2,"severityLevel":4,"message":"a trace","properties":{}}}',
           );
 
           _verifyDataMap(

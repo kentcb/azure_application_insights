@@ -103,7 +103,8 @@ class ExceptionTelemetryItem implements TelemetryItem {
   Map<String, dynamic> serialize({
     required TelemetryContext context,
   }) {
-    final trace = stackTrace == null ? null : Trace.parse(stackTrace.toString());
+    final trace =
+        stackTrace == null ? null : Trace.parse(stackTrace.toString());
     return <String, dynamic>{
       'baseType': 'ExceptionData',
       'baseData': <String, dynamic>{
@@ -123,7 +124,8 @@ class ExceptionTelemetryItem implements TelemetryItem {
 
   String _generateProblemId(Trace? trace) {
     // Make a best effort at disambiguating errors by using the error message and the first frame from any available stack trace.
-    final code = '$error${trace == null || trace.frames.isEmpty ? '' : trace.frames[0].toString()}';
+    final code =
+        '$error${trace == null || trace.frames.isEmpty ? '' : trace.frames[0].toString()}';
     final codeBytes = utf8.encode(code);
     final hash = sha1.convert(codeBytes);
     final result = hash.toString();
@@ -284,7 +286,7 @@ class DependencyTelemetryItem implements TelemetryItem {
     required this.id,
     required this.duration,
     required this.resultCode,
-    this.type,
+    required this.type,
     this.target,
     this.name,
     this.success,
@@ -309,10 +311,10 @@ class DependencyTelemetryItem implements TelemetryItem {
   /// The result code for the dependency call.
   final String resultCode;
 
-  /// The type of the dependency, which is optional. (Examples: sql, http, ajax)
-  final String? type;
+  /// The type of the dependency, which is optional (e.g. `HTTP`, `SQL`, `Ajax`).
+  final String type;
 
-  /// The target of the dependency call, which is optional. (Examples: server name and host address)
+  /// The target of the dependency call, which is optional (e.g. server name and host address).
   final String? target;
 
   /// The name of the dependency call, which is optional.
@@ -321,7 +323,7 @@ class DependencyTelemetryItem implements TelemetryItem {
   /// Whether the dependency call was successful or not, which is optional.
   final bool? success;
 
-  /// This field is the command initiated by this dependency call, which is optional. (Examples: HTTP URL with all query parameters)
+  /// This field is the command initiated by this dependency call, which is optional (e.g. HTTP URL with all query parameters).
   final String? data;
 
   /// Any additional properties to submit with the telemetry.
@@ -338,7 +340,7 @@ class DependencyTelemetryItem implements TelemetryItem {
           'id': id,
           'duration': formatDurationForDotNet(duration),
           'resultCode': resultCode,
-          'type': type ?? "Ajax",
+          'type': type,
           if (target != null) 'target': target,
           if (name != null) 'name': name,
           if (success != null) 'success': success,
