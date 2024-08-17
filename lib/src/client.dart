@@ -132,12 +132,12 @@ class TelemetryClient {
 
   /// Creates a [DependencyTelemetryItem] item and forwards it onto the [processor].
   void trackDependency({
-    required String id,
-    required Duration duration,
-    required String resultCode,
-    required String type,
+    required String name,
+    String? id,
+    String? type,
+    String? resultCode,
     String? target,
-    String? name,
+    Duration? duration,
     bool? success,
     String? data,
     Map<String, Object> additionalProperties = const <String, Object>{},

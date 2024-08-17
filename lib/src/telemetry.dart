@@ -283,12 +283,12 @@ class RequestTelemetryItem implements TelemetryItem {
 class DependencyTelemetryItem implements TelemetryItem {
   /// Creates an instance of [DependencyTelemetryItem] with the specified [id], [duration], and [responseCode].
   DependencyTelemetryItem({
-    required this.id,
-    required this.duration,
-    required this.resultCode,
-    required this.type,
+    required this.name,
+    this.id,
+    this.type,
+    this.resultCode,
     this.target,
-    this.name,
+    this.duration,
     this.success,
     this.data,
     this.additionalProperties = const <String, Object>{},
@@ -302,23 +302,23 @@ class DependencyTelemetryItem implements TelemetryItem {
   @override
   final DateTime timestamp;
 
+  /// The name of the command initiated with this dependency call (e.g. a URL path template or stored procedure name).
+  final String name;
+
   /// The ID of the dependency call.
-  final String id;
-
-  /// The duration of the dependency call.
-  final Duration duration;
-
-  /// The result code for the dependency call.
-  final String resultCode;
+  final String? id;
 
   /// The type of the dependency, which is optional (e.g. `HTTP`, `SQL`, `Ajax`).
-  final String type;
+  final String? type;
+
+  /// The result code for the dependency call, which is optional.
+  final String? resultCode;
 
   /// The target of the dependency call, which is optional (e.g. server name and host address).
   final String? target;
 
-  /// The name of the dependency call, which is optional.
-  final String? name;
+  /// The duration of the dependency call, which is optional.
+  final Duration? duration;
 
   /// Whether the dependency call was successful or not, which is optional.
   final bool? success;
@@ -337,12 +337,12 @@ class DependencyTelemetryItem implements TelemetryItem {
         'baseType': 'RemoteDependencyData',
         'baseData': <String, dynamic>{
           'ver': 2,
-          'id': id,
-          'duration': formatDurationForDotNet(duration),
-          'resultCode': resultCode,
-          'type': type,
+          'name': name,
+          if (id != null) 'id': id,
+          if (type != null) 'type': type,
+          if (resultCode != null) 'resultCode': resultCode,
           if (target != null) 'target': target,
-          if (name != null) 'name': name,
+          if (duration != null) 'duration': formatDurationForDotNet(duration),
           if (success != null) 'success': success,
           if (data != null) 'data': data,
           'properties': <String, dynamic>{

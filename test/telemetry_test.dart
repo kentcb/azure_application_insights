@@ -292,100 +292,93 @@ void _dependencyTelemetry() {
         () {
           _verifyDataMap(
             telemetry: DependencyTelemetryItem(
-              id: 'dependency-id',
-              duration: const Duration(milliseconds: 2301),
-              resultCode: '200',
-              type: 'HTTP',
+              name: 'somename',
             ),
             context: TelemetryContext(),
             expectedJson:
-                '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"id":"dependency-id","duration":"00:00:02.301000",'
-                '"resultCode":"200","type":"HTTP","properties":{}}}',
+                '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"name":"somename","properties":{}}}',
           );
 
           _verifyDataMap(
             telemetry: DependencyTelemetryItem(
-              id: 'dependency-with-type',
-              duration: const Duration(milliseconds: 2301),
-              resultCode: '200',
+              name: 'name',
+              id: 'dependency-id',
+            ),
+            context: TelemetryContext(),
+            expectedJson:
+                '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"name":"name","id":"dependency-id","properties":{}}}',
+          );
+
+          _verifyDataMap(
+            telemetry: DependencyTelemetryItem(
+              name: 'name',
               type: 'sometype',
             ),
             context: TelemetryContext(),
             expectedJson:
-                '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"id":"dependency-with-type","duration":"00:00:02.301000",'
-                '"resultCode":"200","type":"sometype","properties":{}}}',
+                '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"name":"name","type":"sometype","properties":{}}}',
           );
 
           _verifyDataMap(
             telemetry: DependencyTelemetryItem(
-              id: 'dependency-with-target',
-              duration: const Duration(milliseconds: 2301),
-              resultCode: '200',
-              type: 'HTTP',
+              name: 'name',
+              resultCode: 'someresultcode',
+            ),
+            context: TelemetryContext(),
+            expectedJson:
+                '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"name":"name","resultCode":"someresultcode","properties":{}}}',
+          );
+
+          _verifyDataMap(
+            telemetry: DependencyTelemetryItem(
+              name: 'name',
               target: 'https://someserver.com',
             ),
             context: TelemetryContext(),
             expectedJson:
-                '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"id":"dependency-with-target","duration":"00:00:02.301000",'
-                '"resultCode":"200","type":"HTTP","target":"https://someserver.com","properties":{}}}',
+                '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"name":"name","target":"https://someserver.com","properties":{}}}',
           );
 
           _verifyDataMap(
             telemetry: DependencyTelemetryItem(
-              id: 'dependency-with-name',
+              name: 'name',
               duration: const Duration(milliseconds: 2301),
-              resultCode: '200',
-              type: 'HTTP',
-              name: 'a name',
             ),
             context: TelemetryContext(),
             expectedJson:
-                '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"id":"dependency-with-name","duration":"00:00:02.301000",'
-                '"resultCode":"200","type":"HTTP","name":"a name","properties":{}}}',
+                '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"name":"name","duration":"00:00:02.301000","properties":{}}}',
           );
 
           _verifyDataMap(
             telemetry: DependencyTelemetryItem(
-              id: 'dependency-with-success',
-              duration: const Duration(milliseconds: 2301),
-              resultCode: '200',
-              type: 'HTTP',
+              name: 'name',
               success: true,
             ),
             context: TelemetryContext(),
             expectedJson:
-                '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"id":"dependency-with-success","duration":"00:00:02.301000",'
-                '"resultCode":"200","type":"HTTP","success":true,"properties":{}}}',
+                '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"name":"name","success":true,"properties":{}}}',
           );
 
           _verifyDataMap(
             telemetry: DependencyTelemetryItem(
-              id: 'dependency-with-data',
-              duration: const Duration(milliseconds: 2301),
-              resultCode: '200',
-              type: 'HTTP',
+              name: 'name',
               data: 'http://somewhere/',
             ),
             context: TelemetryContext(),
             expectedJson:
-                '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"id":"dependency-with-data","duration":"00:00:02.301000",'
-                '"resultCode":"200","type":"HTTP","data":"http://somewhere/","properties":{}}}',
+                '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"name":"name","data":"http://somewhere/","properties":{}}}',
           );
 
           _verifyDataMap(
             telemetry: DependencyTelemetryItem(
-              id: 'dependency-with-properties',
-              duration: const Duration(milliseconds: 2301),
-              resultCode: '200',
-              type: 'HTTP',
+              name: 'name',
               additionalProperties: const <String, Object>{
                 'another': 1,
               },
             ),
             context: TelemetryContext()..properties['foo'] = 'bar',
             expectedJson:
-                '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"id":"dependency-with-properties","duration":"00:00:02.301000"'
-                ',"resultCode":"200","type":"HTTP","properties":{"foo":"bar","another":1}}}',
+                '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"name":"name","properties":{"foo":"bar","another":1}}}',
           );
         },
       );
