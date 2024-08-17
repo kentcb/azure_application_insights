@@ -39,7 +39,68 @@ void _telemetryHttpClient() {
       );
 
       test(
-        'request URLs are recorded',
+        'request path is recorded as dependency name',
+        () async {
+          Future<void> doVerify({
+            required Uri uri,
+            required String expected,
+          }) async {
+            final telemetryClient = MockTelemetryClient();
+            final sut = TelemetryHttpClient(
+              inner: MockClient(),
+              telemetryClient: telemetryClient,
+            );
+            await sut.get(uri);
+
+            expect(
+              verify(
+                telemetryClient.trackDependency(
+                  name: captureAnyNamed('name'),
+                  id: anyNamed('id'),
+                  type: anyNamed('type'),
+                  data: anyNamed('data'),
+                  target: anyNamed('target'),
+                  resultCode: anyNamed('resultCode'),
+                  duration: anyNamed('duration'),
+                  success: anyNamed('success'),
+                  additionalProperties: anyNamed('additionalProperties'),
+                  timestamp: anyNamed('timestamp'),
+                ),
+              ).captured.single,
+              expected,
+            );
+          }
+
+          // name can't be an empty string, so there's a special case when the path is empty.
+          doVerify(
+            uri: Uri.parse('http://www.whatever.com'),
+            expected: '/',
+          );
+
+          doVerify(
+            uri: Uri.parse('http://www.whatever.com/'),
+            expected: '/',
+          );
+
+          doVerify(
+            uri: Uri.parse('http://www.whatever.com/some/path/'),
+            expected: '/some/path/',
+          );
+
+          doVerify(
+            uri: Uri.parse('http://www.whatever.com/some/path'),
+            expected: '/some/path',
+          );
+
+          doVerify(
+            uri: Uri.parse('http://www.whatever.com/some/path?foo=bar'),
+            expected: '/some/path',
+          );
+        },
+      );
+
+      test(
+        'dependency type is always HTTP',
         () async {
           final telemetryClient = MockTelemetryClient();
           final sut = TelemetryHttpClient(
@@ -50,64 +111,141 @@ void _telemetryHttpClient() {
 
           expect(
             verify(
-              telemetryClient.trackRequest(
+              telemetryClient.trackDependency(
+                name: anyNamed('name'),
                 id: anyNamed('id'),
-                url: captureAnyNamed('url'),
+                type: captureAnyNamed('type'),
+                data: anyNamed('data'),
+                target: anyNamed('target'),
+                resultCode: anyNamed('resultCode'),
                 duration: anyNamed('duration'),
-                responseCode: anyNamed('responseCode'),
                 success: anyNamed('success'),
                 additionalProperties: anyNamed('additionalProperties'),
                 timestamp: anyNamed('timestamp'),
               ),
             ).captured.single,
-            'http://www.whatever.com',
+            'HTTP',
           );
         },
       );
 
-      // Per the comments on the quiver package, it is not possible to control time with Dart's Stopwatch or DateTime classes unless you
-      // use the clock package. I don't want to force that dependency on consumers, so am leaving this test out for now.
-      //
-      // test(
-      //   'request durations are recorded',
-      //   () {
-      //     FakeAsync().run(
-      //       (async) {
-      //         final inner = MockClient();
-      //         when(inner.send(any)).thenAnswer((_) {
-      //           async.elapse(const Duration(seconds: 3));
-      //           return Future.value(MockStreamedResponse());
-      //         });
+      test(
+        'request URL is recorded as dependency data',
+        () async {
+          Future<void> doVerify({
+            required Uri uri,
+            required String expected,
+          }) async {
+            final telemetryClient = MockTelemetryClient();
+            final sut = TelemetryHttpClient(
+              inner: MockClient(),
+              telemetryClient: telemetryClient,
+            );
+            await sut.get(uri);
 
-      //         final telemetryClient = MockTelemetryClient();
-      //         final sut = TelemetryHttpClient(
-      //           inner: inner,
-      //           telemetryClient: telemetryClient,
-      //         );
-      //         sut.get('http://www.whatever.com');
-      //         async.flushMicrotasks();
+            expect(
+              verify(
+                telemetryClient.trackDependency(
+                  name: anyNamed('name'),
+                  id: anyNamed('id'),
+                  type: anyNamed('type'),
+                  data: captureAnyNamed('data'),
+                  target: anyNamed('target'),
+                  resultCode: anyNamed('resultCode'),
+                  duration: anyNamed('duration'),
+                  success: anyNamed('success'),
+                  additionalProperties: anyNamed('additionalProperties'),
+                  timestamp: anyNamed('timestamp'),
+                ),
+              ).captured.single,
+              expected,
+            );
+          }
 
-      //         expect(
-      //           verify(
-      //             telemetryClient.trackRequest(
-      //               id: anyNamed('id'),
-      //               url: anyNamed('url'),
-      //               duration: captureAnyNamed('duration'),
-      //               responseCode: anyNamed('responseCode'),
-      //               success: anyNamed('success'),
-      //               properties: anyNamed('additionalProperties'),
-      //               timestamp: anyNamed('timestamp'),
-      //             ),
-      //           ).captured.single,
-      //           const Duration(seconds: 3),
-      //         );
-      //       },
-      //     );
-      //   },
-      // );
+          doVerify(
+            uri: Uri.parse('http://www.whatever.com'),
+            expected: 'http://www.whatever.com',
+          );
+
+          doVerify(
+            uri: Uri.parse('http://www.whatever.com/'),
+            expected: 'http://www.whatever.com/',
+          );
+
+          doVerify(
+            uri: Uri.parse('http://www.whatever.com/some/path/'),
+            expected: 'http://www.whatever.com/some/path/',
+          );
+
+          doVerify(
+            uri: Uri.parse('http://www.whatever.com/some/path/'),
+            expected: 'http://www.whatever.com/some/path/',
+          );
+
+          doVerify(
+            uri: Uri.parse('http://www.whatever.com/some/path?foo=bar'),
+            expected: 'http://www.whatever.com/some/path?foo=bar',
+          );
+
+          doVerify(
+            uri: Uri.parse('https://www.whatever.com/some/path?foo=bar'),
+            expected: 'https://www.whatever.com/some/path?foo=bar',
+          );
+        },
+      );
 
       test(
-        'response codes are recorded',
+        'host is recorded as dependency target',
+        () async {
+          Future<void> doVerify({
+            required Uri uri,
+            required String expected,
+          }) async {
+            final telemetryClient = MockTelemetryClient();
+            final sut = TelemetryHttpClient(
+              inner: MockClient(),
+              telemetryClient: telemetryClient,
+            );
+            await sut.get(uri);
+
+            expect(
+              verify(
+                telemetryClient.trackDependency(
+                  name: anyNamed('name'),
+                  id: anyNamed('id'),
+                  type: anyNamed('type'),
+                  data: anyNamed('data'),
+                  target: captureAnyNamed('target'),
+                  resultCode: anyNamed('resultCode'),
+                  duration: anyNamed('duration'),
+                  success: anyNamed('success'),
+                  additionalProperties: anyNamed('additionalProperties'),
+                  timestamp: anyNamed('timestamp'),
+                ),
+              ).captured.single,
+              expected,
+            );
+          }
+
+          doVerify(
+            uri: Uri.parse('http://www.whatever.com'),
+            expected: 'www.whatever.com',
+          );
+
+          doVerify(
+            uri: Uri.parse('http://www.whatever.com/some/path?foo=bar'),
+            expected: 'www.whatever.com',
+          );
+
+          doVerify(
+            uri: Uri.parse('https://something.io/some/path?foo=bar'),
+            expected: 'something.io',
+          );
+        },
+      );
+
+      test(
+        'result codes are recorded',
         () async {
           Future<void> verifyStatusCode({
             required int statusCode,
@@ -130,11 +268,14 @@ void _telemetryHttpClient() {
             await sut.get(Uri.parse('http://www.whatever.com'));
 
             final captured = verify(
-              telemetryClient.trackRequest(
+              telemetryClient.trackDependency(
+                name: anyNamed('name'),
                 id: anyNamed('id'),
-                url: anyNamed('url'),
+                type: anyNamed('type'),
+                data: anyNamed('data'),
+                target: anyNamed('target'),
+                resultCode: captureAnyNamed('resultCode'),
                 duration: anyNamed('duration'),
-                responseCode: captureAnyNamed('responseCode'),
                 success: captureAnyNamed('success'),
                 additionalProperties: anyNamed('additionalProperties'),
                 timestamp: anyNamed('timestamp'),
@@ -183,11 +324,14 @@ void _telemetryHttpClient() {
           );
 
           final properties = verify(
-            telemetryClient.trackRequest(
+            telemetryClient.trackDependency(
+              name: anyNamed('name'),
               id: anyNamed('id'),
-              url: anyNamed('url'),
+              type: anyNamed('type'),
+              data: anyNamed('data'),
+              target: anyNamed('target'),
+              resultCode: anyNamed('resultCode'),
               duration: anyNamed('duration'),
-              responseCode: anyNamed('responseCode'),
               success: anyNamed('success'),
               additionalProperties: captureAnyNamed('additionalProperties'),
               timestamp: anyNamed('timestamp'),
@@ -221,11 +365,14 @@ void _telemetryHttpClient() {
           );
 
           final timestamp = verify(
-            telemetryClient.trackRequest(
+            telemetryClient.trackDependency(
+              name: anyNamed('name'),
               id: anyNamed('id'),
-              url: anyNamed('url'),
+              type: anyNamed('type'),
+              data: anyNamed('data'),
+              target: anyNamed('target'),
+              resultCode: anyNamed('resultCode'),
               duration: anyNamed('duration'),
-              responseCode: anyNamed('responseCode'),
               success: anyNamed('success'),
               additionalProperties: anyNamed('additionalProperties'),
               timestamp: captureAnyNamed('timestamp'),
@@ -256,11 +403,14 @@ void _telemetryHttpClient() {
           );
 
           final properties = verify(
-            telemetryClient.trackRequest(
+            telemetryClient.trackDependency(
+              name: anyNamed('name'),
               id: anyNamed('id'),
-              url: anyNamed('url'),
+              type: anyNamed('type'),
+              data: anyNamed('data'),
+              target: anyNamed('target'),
+              resultCode: anyNamed('resultCode'),
               duration: anyNamed('duration'),
-              responseCode: anyNamed('responseCode'),
               success: anyNamed('success'),
               additionalProperties: captureAnyNamed('additionalProperties'),
               timestamp: anyNamed('timestamp'),
@@ -295,11 +445,14 @@ void _telemetryHttpClient() {
           );
 
           final properties = verify(
-            telemetryClient.trackRequest(
+            telemetryClient.trackDependency(
+              name: anyNamed('name'),
               id: anyNamed('id'),
-              url: anyNamed('url'),
+              type: anyNamed('type'),
+              data: anyNamed('data'),
+              target: anyNamed('target'),
+              resultCode: anyNamed('resultCode'),
               duration: anyNamed('duration'),
-              responseCode: anyNamed('responseCode'),
               success: anyNamed('success'),
               additionalProperties: captureAnyNamed('additionalProperties'),
               timestamp: anyNamed('timestamp'),
@@ -312,6 +465,47 @@ void _telemetryHttpClient() {
           expect(properties['contentLength'], 6);
         },
       );
+
+      // Per the comments on the quiver package, it is not possible to control time with Dart's Stopwatch or DateTime classes unless you
+      // use the clock package. I don't want to force that dependency on consumers, so am leaving this test out for now.
+      //
+      // test(
+      //   'request durations are recorded',
+      //   () {
+      //     FakeAsync().run(
+      //       (async) {
+      //         final inner = MockClient();
+      //         when(inner.send(any)).thenAnswer((_) {
+      //           async.elapse(const Duration(seconds: 3));
+      //           return Future.value(MockStreamedResponse());
+      //         });
+
+      //         final telemetryClient = MockTelemetryClient();
+      //         final sut = TelemetryHttpClient(
+      //           inner: inner,
+      //           telemetryClient: telemetryClient,
+      //         );
+      //         sut.get('http://www.whatever.com');
+      //         async.flushMicrotasks();
+
+      //         expect(
+      //           verify(
+      //             telemetryClient.trackRequest(
+      //               id: anyNamed('id'),
+      //               url: anyNamed('url'),
+      //               duration: captureAnyNamed('duration'),
+      //               responseCode: anyNamed('responseCode'),
+      //               success: anyNamed('success'),
+      //               properties: anyNamed('additionalProperties'),
+      //               timestamp: anyNamed('timestamp'),
+      //             ),
+      //           ).captured.single,
+      //           const Duration(seconds: 3),
+      //         );
+      //       },
+      //     );
+      //   },
+      // );
     },
   );
 }

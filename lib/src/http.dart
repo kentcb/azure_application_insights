@@ -4,7 +4,7 @@ import 'package:azure_application_insights/src/client.dart';
 import 'package:http/http.dart';
 
 /// A [Client] that automatically forwards the details of all completed HTTP requests onto [telemetryClient] via
-/// the [TelemetryClient.trackRequest] method.
+/// the [TelemetryClient.trackDependency] method.
 ///
 /// Use an instance of [TelemetryHttpClient], either directly or as part of composed HTTP middleware, to ensure all
 /// requests result in appropriate telemetry items being created via [telemetryClient]. All request telemetry items
@@ -59,12 +59,15 @@ class TelemetryHttpClient extends BaseClient {
         .where((e) => appendHeader(e.key))
         .map((e) => '${e.key}=${e.value}')
         .join(',');
-    telemetryClient.trackRequest(
+    telemetryClient.trackDependency(
+      name: request.url.path.isEmpty ? '/' : request.url.path,
       id: _generateRequestId(),
-      url: request.url.toString(),
-      duration: stopwatch.elapsed,
-      responseCode: response.statusCode.toString(),
+      type: 'HTTP',
+      data: request.url.toString(),
+      target: request.url.host,
+      resultCode: response.statusCode.toString(),
       success: response.statusCode >= 200 && response.statusCode < 300,
+      duration: stopwatch.elapsed,
       additionalProperties: <String, Object>{
         'method': request.method,
         if (headers.isNotEmpty) 'headers': headers,
