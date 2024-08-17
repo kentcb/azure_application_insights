@@ -8,6 +8,7 @@ void main() {
   _exceptionTelemetry();
   _pageViewTelemetry();
   _requestTelemetry();
+  _dependencyTelemetry();
   _traceTelemetry();
 }
 
@@ -275,6 +276,109 @@ void _requestTelemetry() {
             expectedJson:
                 '{"baseType":"RequestData","baseData":{"ver":2,"id":"request-with-properties","duration":"00:00:02.301000"'
                 ',"responseCode":"200","properties":{"foo":"bar","another":1}}}',
+          );
+        },
+      );
+    },
+  );
+}
+
+void _dependencyTelemetry() {
+  group(
+    'DependencyTelemetry',
+    () {
+      test(
+        'getDataMap',
+        () {
+          _verifyDataMap(
+            telemetry: DependencyTelemetryItem(
+              name: 'somename',
+            ),
+            context: TelemetryContext(),
+            expectedJson:
+                '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"name":"somename","properties":{}}}',
+          );
+
+          _verifyDataMap(
+            telemetry: DependencyTelemetryItem(
+              name: 'name',
+              id: 'dependency-id',
+            ),
+            context: TelemetryContext(),
+            expectedJson:
+                '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"name":"name","id":"dependency-id","properties":{}}}',
+          );
+
+          _verifyDataMap(
+            telemetry: DependencyTelemetryItem(
+              name: 'name',
+              type: 'sometype',
+            ),
+            context: TelemetryContext(),
+            expectedJson:
+                '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"name":"name","type":"sometype","properties":{}}}',
+          );
+
+          _verifyDataMap(
+            telemetry: DependencyTelemetryItem(
+              name: 'name',
+              resultCode: 'someresultcode',
+            ),
+            context: TelemetryContext(),
+            expectedJson:
+                '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"name":"name","resultCode":"someresultcode","properties":{}}}',
+          );
+
+          _verifyDataMap(
+            telemetry: DependencyTelemetryItem(
+              name: 'name',
+              target: 'https://someserver.com',
+            ),
+            context: TelemetryContext(),
+            expectedJson:
+                '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"name":"name","target":"https://someserver.com","properties":{}}}',
+          );
+
+          _verifyDataMap(
+            telemetry: DependencyTelemetryItem(
+              name: 'name',
+              duration: const Duration(milliseconds: 2301),
+            ),
+            context: TelemetryContext(),
+            expectedJson:
+                '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"name":"name","duration":"00:00:02.301000","properties":{}}}',
+          );
+
+          _verifyDataMap(
+            telemetry: DependencyTelemetryItem(
+              name: 'name',
+              success: true,
+            ),
+            context: TelemetryContext(),
+            expectedJson:
+                '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"name":"name","success":true,"properties":{}}}',
+          );
+
+          _verifyDataMap(
+            telemetry: DependencyTelemetryItem(
+              name: 'name',
+              data: 'http://somewhere/',
+            ),
+            context: TelemetryContext(),
+            expectedJson:
+                '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"name":"name","data":"http://somewhere/","properties":{}}}',
+          );
+
+          _verifyDataMap(
+            telemetry: DependencyTelemetryItem(
+              name: 'name',
+              additionalProperties: const <String, Object>{
+                'another': 1,
+              },
+            ),
+            context: TelemetryContext()..properties['foo'] = 'bar',
+            expectedJson:
+                '{"baseType":"RemoteDependencyData","baseData":{"ver":2,"name":"name","properties":{"foo":"bar","another":1}}}',
           );
         },
       );

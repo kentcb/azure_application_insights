@@ -130,6 +130,34 @@ class TelemetryClient {
         ),
       );
 
+  /// Creates a [DependencyTelemetryItem] item and forwards it onto the [processor].
+  void trackDependency({
+    required String name,
+    String? id,
+    String? type,
+    String? resultCode,
+    String? target,
+    Duration? duration,
+    bool? success,
+    String? data,
+    Map<String, Object> additionalProperties = const <String, Object>{},
+    DateTime? timestamp,
+  }) =>
+      _track(
+        DependencyTelemetryItem(
+          duration: duration,
+          id: id,
+          name: name,
+          additionalProperties: additionalProperties,
+          resultCode: resultCode,
+          target: target,
+          success: success,
+          data: data,
+          type: type,
+          timestamp: timestamp,
+        ),
+      );
+
   /// Creates a [TraceTelemetryItem] item and forwards it onto the [processor].
   void trackTrace({
     required Severity severity,

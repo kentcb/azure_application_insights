@@ -164,6 +164,7 @@ void _transmissionProcessor() {
             httpClient: httpClient,
             timeout: const Duration(seconds: 10),
           );
+
           sut.process(
             contextualTelemetryItems: [
               ContextualTelemetryItem(

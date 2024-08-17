@@ -12,6 +12,7 @@ void main() {
   _trackEvent();
   _trackPageView();
   _trackRequest();
+  _trackDependency();
   _trackTrace();
   _flush();
 }
@@ -199,6 +200,54 @@ void _trackRequest() {
                 return telemetry.id == 'a request' &&
                     telemetry.duration == const Duration(milliseconds: 283) &&
                     telemetry.responseCode == '200';
+              }
+
+              return false;
+            }),
+          );
+        },
+      );
+    },
+  );
+}
+
+void _trackDependency() {
+  group(
+    'trackDependency',
+    () {
+      test(
+        'creates dependency telemetry and forwards to processor',
+        () {
+          final processor = MockProcessor();
+          final sut = TelemetryClient(processor: processor);
+          sut.trackDependency(
+              id: 'a dependency call',
+              duration: const Duration(milliseconds: 283),
+              resultCode: '200',
+              type: 'customType',
+              name: 'somename',
+              data: 'somedata');
+
+          expect(
+            verify(processor.process(
+                    contextualTelemetryItems:
+                        captureAnyNamed('contextualTelemetryItems')))
+                .captured
+                .single,
+            predicate<List<ContextualTelemetryItem>>((v) {
+              if (v.length != 1) {
+                return false;
+              }
+
+              final telemetry = v[0].telemetryItem;
+
+              if (telemetry is DependencyTelemetryItem) {
+                return telemetry.id == 'a dependency call' &&
+                    telemetry.duration == const Duration(milliseconds: 283) &&
+                    telemetry.resultCode == '200' &&
+                    telemetry.type == 'customType' &&
+                    telemetry.name == 'somename' &&
+                    telemetry.data == 'somedata';
               }
 
               return false;

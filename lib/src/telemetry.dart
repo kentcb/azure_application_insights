@@ -278,6 +278,81 @@ class RequestTelemetryItem implements TelemetryItem {
       };
 }
 
+/// Represents a dependency telemetry item in Application Insights. Should be used to track Requests made to a backend.
+@immutable
+class DependencyTelemetryItem implements TelemetryItem {
+  /// Creates an instance of [DependencyTelemetryItem] with the specified [id], [duration], and [responseCode].
+  DependencyTelemetryItem({
+    required this.name,
+    this.id,
+    this.type,
+    this.resultCode,
+    this.target,
+    this.duration,
+    this.success,
+    this.data,
+    this.additionalProperties = const <String, Object>{},
+    DateTime? timestamp,
+  })  : assert(timestamp == null || timestamp.isUtc),
+        timestamp = timestamp ?? DateTime.now().toUtc();
+
+  @override
+  String get envelopeName => 'AppDependency';
+
+  @override
+  final DateTime timestamp;
+
+  /// The name of the command initiated with this dependency call (e.g. a URL path template or stored procedure name).
+  final String name;
+
+  /// The ID of the dependency call.
+  final String? id;
+
+  /// The type of the dependency, which is optional (e.g. `HTTP`, `SQL`, `Ajax`).
+  final String? type;
+
+  /// The result code for the dependency call, which is optional.
+  final String? resultCode;
+
+  /// The target of the dependency call, which is optional (e.g. server name and host address).
+  final String? target;
+
+  /// The duration of the dependency call, which is optional.
+  final Duration? duration;
+
+  /// Whether the dependency call was successful or not, which is optional.
+  final bool? success;
+
+  /// This field is the command initiated by this dependency call, which is optional (e.g. HTTP URL with all query parameters).
+  final String? data;
+
+  /// Any additional properties to submit with the telemetry.
+  final Map<String, Object> additionalProperties;
+
+  @override
+  Map<String, dynamic> serialize({
+    required TelemetryContext context,
+  }) =>
+      <String, dynamic>{
+        'baseType': 'RemoteDependencyData',
+        'baseData': <String, dynamic>{
+          'ver': 2,
+          'name': name,
+          if (id != null) 'id': id,
+          if (type != null) 'type': type,
+          if (resultCode != null) 'resultCode': resultCode,
+          if (target != null) 'target': target,
+          if (duration != null) 'duration': formatDurationForDotNet(duration),
+          if (success != null) 'success': success,
+          if (data != null) 'data': data,
+          'properties': <String, dynamic>{
+            ...context.properties,
+            ...additionalProperties,
+          }
+        },
+      };
+}
+
 /// Represents a trace telemetry item in Application Insights.
 @immutable
 class TraceTelemetryItem implements TelemetryItem {
