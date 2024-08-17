@@ -165,7 +165,7 @@ Future<void> submitErrorAsTelemetry({
 
 ### HTTP Middleware
 
-Whilst you can certainly use `TelemetryClient.trackRequest` to track HTTP requests yourself, you can save time by using the `TelemetryHttpClient` HTTP client. This class will automatically time requests and forward on the details of completed requests to a given `TelemetryClient` as request telemetry items.
+Whilst you can certainly use `TelemetryClient.trackDependency` to track HTTP requests yourself, you can save time by using the `TelemetryHttpClient` HTTP client. This class will automatically time requests and forward on the details of completed requests to a given `TelemetryClient` as dependency telemetry items.
 
 Typical usage looks like this:
 
@@ -175,7 +175,7 @@ final telemetryHttpClient = TelemetryHttpClient(
   inner: Client(),
 );
 
-// This request will be captured as a request telemetry item.
+// This request will be captured as a dependency telemetry item.
 await telemetryHttpClient.get('https://kent-boogaart.com/');
 ```
 
