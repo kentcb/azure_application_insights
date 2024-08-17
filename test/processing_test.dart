@@ -164,7 +164,6 @@ void _transmissionProcessor() {
             httpClient: httpClient,
             timeout: const Duration(seconds: 10),
           );
-          final headers = <String, String>{'Sdk-Context': 'appId'};
 
           sut.process(
             contextualTelemetryItems: [
@@ -182,7 +181,6 @@ void _transmissionProcessor() {
             verify(
               httpClient.post(
                 any,
-                headers: headers,
                 body: captureAnyNamed('body'),
               ),
             ).captured.single,
