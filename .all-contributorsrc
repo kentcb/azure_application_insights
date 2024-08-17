@@ -43,6 +43,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "m-gug",
+      "name": "Michael Gugler",
+      "avatar_url": "https://avatars.githubusercontent.com/u/79441396?v=4",
+      "profile": "https://github.com/m-gug",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
