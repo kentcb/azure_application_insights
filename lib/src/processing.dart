@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:azure_application_insights/src/client.dart';
+import 'package:azure_application_insights/src/connection_string.dart';
 import 'package:azure_application_insights/src/context.dart';
 import 'package:azure_application_insights/src/http.dart';
 import 'package:azure_application_insights/src/telemetry.dart';
@@ -124,24 +125,21 @@ class BufferedProcessor implements Processor {
 /// at endpoint [ingestionEndpoint].
 class TransmissionProcessor implements Processor {
   TransmissionProcessor({
-    required this.instrumentationKey,
+    required String connectionString,
     required this.httpClient,
     required this.timeout,
     Logger? logger,
-    this.ingestionEndpoint = 'https://dc.services.visualstudio.com/v2/track',
     this.next,
   })  : logger = logger ?? Logger('TransmissionProcessor'),
-        _ingestionEndpointUri = Uri.parse(ingestionEndpoint),
-        _outstandingFutures = <Future<void>>{};
+        _outstandingFutures = <Future<void>>{} {
+    _parsedConnectionString = parseConnectionString(connectionString);
+    final ingestionEndpoint = _parsedConnectionString.getIngestionEndpoint();
+    _ingestionEndpoint =
+        ingestionEndpoint.replace(path: '${ingestionEndpoint.path}/v2/track');
+  }
 
   @override
   final Processor? next;
-
-  /// The Application Insights instrumentation key to use when submitting telemetry.
-  final String instrumentationKey;
-
-  /// The endpoint to which data is sent.
-  final String ingestionEndpoint;
 
   /// The HTTP client to use when submitting telemetry.
   ///
@@ -155,7 +153,8 @@ class TransmissionProcessor implements Processor {
   /// A [Logger] to which processing information will be written.
   final Logger logger;
 
-  final Uri _ingestionEndpointUri;
+  late final ConnectionString _parsedConnectionString;
+  late final Uri _ingestionEndpoint;
   final Set<Future<void>> _outstandingFutures;
 
   /// Sends [contextualTelemetryItems] to Application Insights, then on to [next].
@@ -199,7 +198,7 @@ class TransmissionProcessor implements Processor {
     try {
       final response = await httpClient
           .post(
-            _ingestionEndpointUri,
+            _ingestionEndpoint,
             body: encoded,
           )
           .timeout(timeout);
@@ -237,7 +236,7 @@ class TransmissionProcessor implements Processor {
     final result = <String, dynamic>{
       'name': contextualTelemetry.telemetryItem.envelopeName,
       'time': contextualTelemetry.telemetryItem.timestamp.toIso8601String(),
-      'iKey': instrumentationKey,
+      'iKey': _parsedConnectionString.instrumentationKey,
       'tags': <String, dynamic>{
         'ai.internal.sdkVersion': '1',
         if (serializedContext != null) ...serializedContext,
