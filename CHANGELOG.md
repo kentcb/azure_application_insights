@@ -1,3 +1,11 @@
+## 5.0.0
+
+- Add ability to track dependency calls (thanks @m-gug)
+- Breaking fix: `TelemetryHttpClient` now uses `trackDependency` rather than `trackRequest`
+- Breaking feature: `TransmissionProcessor` now takes a connection string rather than instrumentation key
+
+> **NOTE:** this is a breaking release. Please review above notes to evaluate impact on your project.
+
 ## 4.0.1
 
 - Downgrade `stack_trace` package for Flutter compatibility (thanks @robsonsilv4)
