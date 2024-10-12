@@ -22,14 +22,14 @@ import 'package:azure_application_insights/azure_application_insights.dart';
 
 ## How?
 
-The only piece of information you need to integrate with Application Insights is your instrumentation key, which you can find inside the Azure portal. Open your Application Insights resource and look in the **Overview** tab.
+The only piece of information you need to integrate with Application Insights is your connection string, which you can find inside the Azure portal. Open your Application Insights resource and look in the **Overview** tab.
 
-Once you have your instrumentation key, you can construct a `TelemetryClient` as follows:
+Once you have your connection string, you can construct a `TelemetryClient` as follows:
 
 ```dart
 final processor = BufferedProcessor(
   next: TransmissionProcessor(
-    instrumentationKey: instrumentationKey,
+    connectionString: connectionString,
     httpClient: client,
     timeout: const Duration(seconds: 10),
   ),
@@ -39,9 +39,6 @@ final telemetryClient = TelemetryClient(
   processor: processor,
 );
 ```
-
-> NOTE: depending on your Azure environment, you may also wish to override the default ingestion endpoint. To do this,
-> provide a value for the `ingestionEndpoint` parameter when creating a `TransmissionProcessor`.
 
 This is a typical setup where telemetry items are buffered before being transmitted. Depending on your processing needs, you may have a need for more than one `TelemetryClient` in your application. For example, you might have one `TelemetryClient` that buffers telemetry items and is used for all telemetry other than errors, and a second that does not buffer and is used only to submit errors as promptly as possible. Please review the example code and API docs for alternative configurations.
 
