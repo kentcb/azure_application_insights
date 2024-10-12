@@ -59,6 +59,7 @@ class TelemetryHttpClient extends BaseClient {
         .where((e) => appendHeader(e.key))
         .map((e) => '${e.key}=${e.value}')
         .join(',');
+
     telemetryClient.trackDependency(
       name: request.url.path.isEmpty ? '/' : request.url.path,
       id: _generateRequestId(),

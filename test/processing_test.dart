@@ -160,7 +160,7 @@ void _transmissionProcessor() {
         () {
           final httpClient = MockClient();
           final sut = TransmissionProcessor(
-            instrumentationKey: 'key',
+            connectionString: 'InstrumentationKey=key',
             httpClient: httpClient,
             timeout: const Duration(seconds: 10),
           );
@@ -195,7 +195,7 @@ void _transmissionProcessor() {
           final httpClient = MockClient();
           final next = MockProcessor();
           final sut = TransmissionProcessor(
-            instrumentationKey: 'key',
+            connectionString: 'InstrumentationKey=key',
             httpClient: httpClient,
             timeout: const Duration(seconds: 10),
             next: next,

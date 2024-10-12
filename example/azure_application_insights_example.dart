@@ -3,13 +3,13 @@
 import 'package:azure_application_insights/azure_application_insights.dart';
 import 'package:http/http.dart';
 
-// Copy and paste your Application Insights instrumentation key from the Azure portal.
-const instrumentationKey = 'TODO';
+// Copy and paste your Application Insights connection string from the Azure portal.
+const connectionString = 'TODO';
 
 Future<void> main() async {
-  if (instrumentationKey == 'TODO') {
+  if (connectionString == 'TODO') {
     print(
-      'Before running this example, you must provide your Application Insights instrumentation key by copying it into the code.',
+      'Before running this example, you must provide your Application Insights connection string by copying it into the code.',
     );
     return;
   }
@@ -27,7 +27,7 @@ Future<void> _sendTelemetry() async {
     // forwarding them on for transmission.
     final processor = BufferedProcessor(
       next: TransmissionProcessor(
-        instrumentationKey: instrumentationKey,
+        connectionString: connectionString,
         // You can inject your own HTTP middleware to adjust the behavior of HTTP communications, such as automatically
         // retrying or caching failed requests.
         httpClient: client,
