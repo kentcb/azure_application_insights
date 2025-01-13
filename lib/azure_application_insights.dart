@@ -1,5 +1,5 @@
 /// A Dart client for Azure's Application Insights service.
-library azure_application_insights;
+library;
 
 export 'src/client.dart';
 export 'src/context.dart';

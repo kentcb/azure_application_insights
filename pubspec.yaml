@@ -1,6 +1,6 @@
 name: azure_application_insights
 description: A Dart client to integrate with Azure's Application Insights service
-version: 5.0.0
+version: 5.0.1
 repository: https://github.com/kentcb/azure_application_insights
 
 environment:
@@ -15,7 +15,7 @@ dependencies:
 
 dev_dependencies:
   build_runner: ^2.4.6
-  lint: ^2.1.2
+  lints: ^5.1.1
   mockito: ^5.4.2
   quiver: ^3.2.1
   test: ^1.24.4

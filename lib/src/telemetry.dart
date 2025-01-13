@@ -281,7 +281,7 @@ class RequestTelemetryItem implements TelemetryItem {
 /// Represents a dependency telemetry item in Application Insights. Should be used to track Requests made to a backend.
 @immutable
 class DependencyTelemetryItem implements TelemetryItem {
-  /// Creates an instance of [DependencyTelemetryItem] with the specified [id], [duration], and [responseCode].
+  /// Creates an instance of [DependencyTelemetryItem] with the specified [id], [duration], and [resultCode].
   DependencyTelemetryItem({
     required this.name,
     this.id,
@@ -429,8 +429,6 @@ extension _SeverityExtensions on Severity {
         return 3;
       case Severity.critical:
         return 4;
-      default:
-        throw UnsupportedError('Unsupported value: $this');
     }
   }
 }
