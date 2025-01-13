@@ -121,8 +121,7 @@ class BufferedProcessor implements Processor {
   }
 }
 
-/// A [Processor] that sends telemetry to the Azure Application Insights instance associated with [instrumentationKey]
-/// at endpoint [ingestionEndpoint].
+/// A [Processor] that sends telemetry to the Azure Application Insights instance associated with the provided connection string.
 class TransmissionProcessor implements Processor {
   TransmissionProcessor({
     required String connectionString,

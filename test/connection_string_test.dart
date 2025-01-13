@@ -213,7 +213,7 @@ void _ingestionEndpointFailures() {
           final parsedConnectionString = parseConnectionString(
               'InstrumentationKey=a;IngestionEndpoint=this cannot work');
           expect(
-            () => parsedConnectionString.getIngestionEndpoint(),
+            parsedConnectionString.getIngestionEndpoint,
             throwsA(
               const TypeMatcher<UnsupportedError>().having(
                 (e) => e.message,
@@ -232,7 +232,7 @@ void _ingestionEndpointFailures() {
           final parsedConnectionString = parseConnectionString(
               'InstrumentationKey=a;EndpointSuffix=au;Location=nope!');
           expect(
-            () => parsedConnectionString.getIngestionEndpoint(),
+            parsedConnectionString.getIngestionEndpoint,
             throwsA(
               const TypeMatcher<UnsupportedError>().having(
                 (e) => e.message,
