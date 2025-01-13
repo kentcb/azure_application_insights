@@ -1,3 +1,7 @@
+## 5.0.1
+
+- Minor fixes for static analysis
+
 ## 5.0.0
 
 - Add ability to track dependency calls (thanks @m-gug)
