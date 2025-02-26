@@ -1,6 +1,7 @@
 // ignore_for_file: cascade_invocations
 
 import 'package:azure_application_insights/azure_application_insights.dart';
+import 'package:http/http.dart';
 import 'package:mockito/mockito.dart';
 import 'package:quiver/testing/async.dart';
 import 'package:test/test.dart';
@@ -216,6 +217,96 @@ void _transmissionProcessor() {
                   contextualTelemetryItems:
                       anyNamed('contextualTelemetryItems')))
               .called(1);
+        },
+      );
+
+      test(
+        'onError() callback receives the response status code when the HttpClient gives failure status code in TransmissionProcessor',
+        () {
+          void onError(
+            List<ContextualTelemetryItem> contextualTelemetryItems,
+            int? responseStatusCode,
+            Object? exception,
+          ) {
+            final eventName = (contextualTelemetryItems
+                    .firstOrNull?.telemetryItem as EventTelemetryItem?)
+                ?.name;
+
+            // Validating the data received from processor in onError() callback
+            expect(eventName, 'mock event');
+            expect(responseStatusCode, 400);
+          }
+
+          final httpClient = MockClient();
+          final sut = TransmissionProcessor(
+            connectionString: 'InstrumentationKey=key',
+            httpClient: httpClient,
+            timeout: const Duration(seconds: 10),
+            onError: onError,
+          );
+
+          when(httpClient.post(
+            any,
+            body: anyNamed('body'),
+          )).thenAnswer((_) async => Response('', 400));
+
+          sut.process(
+            contextualTelemetryItems: [
+              ContextualTelemetryItem(
+                telemetryItem: EventTelemetryItem(
+                  name: 'mock event',
+                  timestamp: DateTime.utc(2020, 10, 26),
+                ),
+                context: TelemetryContext(),
+              ),
+            ],
+          );
+        },
+      );
+
+      test(
+        'onError() callback receives the exception object when the HttpClient throws exception during API call in TransmissionProcessor',
+        () {
+          final mockException = Exception('mock exception');
+
+          void onError(
+            List<ContextualTelemetryItem> contextualTelemetryItems,
+            int? responseStatusCode,
+            Object? exception,
+          ) {
+            final eventName = (contextualTelemetryItems
+                    .firstOrNull?.telemetryItem as EventTelemetryItem?)
+                ?.name;
+
+            // Validating the data received from processor in onError() callback
+            expect(eventName, 'mock event');
+            expect(exception, mockException);
+          }
+
+          final httpClient = MockClient();
+          final sut = TransmissionProcessor(
+            connectionString: 'InstrumentationKey=key',
+            httpClient: httpClient,
+            timeout: const Duration(seconds: 10),
+            onError: onError,
+          );
+
+          when(httpClient.post(
+            any,
+            body: anyNamed('body'),
+          )).thenThrow(mockException);
+
+          sut.process(
+            contextualTelemetryItems: [
+              ContextualTelemetryItem(
+                telemetryItem: EventTelemetryItem(
+                  name: 'mock event',
+                  timestamp: DateTime.utc(2020, 10, 26),
+                ),
+                context: TelemetryContext(),
+              ),
+            ],
+          );
         },
       );
     },

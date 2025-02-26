@@ -129,6 +129,7 @@ class TransmissionProcessor implements Processor {
     required this.timeout,
     Logger? logger,
     this.next,
+    this.onError,
   })  : logger = logger ?? Logger('TransmissionProcessor'),
         _outstandingFutures = <Future<void>>{} {
     _parsedConnectionString = parseConnectionString(connectionString);
@@ -136,6 +137,12 @@ class TransmissionProcessor implements Processor {
     _ingestionEndpoint =
         ingestionEndpoint.replace(path: '${ingestionEndpoint.path}/v2/track');
   }
+
+  final void Function(
+    List<ContextualTelemetryItem> contextualTelemetryItems,
+    int? responseStatusCode,
+    Object? exception,
+  )? onError;
 
   @override
   final Processor? next;
@@ -204,9 +211,11 @@ class TransmissionProcessor implements Processor {
       final result = response.statusCode >= 200 && response.statusCode < 300;
 
       if (!result) {
+        onError?.call(contextualTelemetry, response.statusCode, null);
         logger.severe('Failed to submit telemetry: ${response.statusCode}');
       }
     } on Object catch (e) {
+      onError?.call(contextualTelemetry, null, e);
       logger.warning('Failed to submit telemetry: $e');
     }
   }
